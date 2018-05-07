@@ -4,7 +4,7 @@ Atenção: Esse projeto foi baseado nesse maravilhoso [boilerplate](https://gith
 
 
 ## Overview
-REST API do Googol, contruida utilizando Node + Express + MongoDB.
+REST API do Googol, construída utilizando Node + Express + MongoDB.
 
 ## Getting Started
 
