@@ -1,4 +1,5 @@
 const User = require('./user.model');
+const Team = require('../team/team.model'); // eslint-disable-line
 
 /**
  * Load user and append to req.
@@ -23,13 +24,11 @@ function get(req, res) {
 /**
  * Create new user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.mobileNumber - The mobileNumber of user.
  * @returns {User}
  */
 function create(req, res, next) {
   const user = new User({
     username: req.body.username,
-    mobileNumber: req.body.mobileNumber
   });
 
   user.save()
@@ -40,14 +39,11 @@ function create(req, res, next) {
 /**
  * Update existing user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.mobileNumber - The mobileNumber of user.
  * @returns {User}
  */
 function update(req, res, next) {
   const user = req.user;
   user.username = req.body.username;
-  user.mobileNumber = req.body.mobileNumber;
-
   user.save()
     .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
