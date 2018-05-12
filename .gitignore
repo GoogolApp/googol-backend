@@ -10,6 +10,7 @@ pids
 
 # IDE
 .idea
+.vscode/
 express-mongoose-es6-rest-api.iml
 
 # OS generated files

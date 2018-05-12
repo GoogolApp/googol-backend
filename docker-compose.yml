@@ -14,9 +14,10 @@ services:
       # node_modules from this new volume will be used and not from your local dev env.
       - /app/node_modules/
 
-    # Expose ports [HOST:CONTAINER}
+    # Expose ports [HOST:CONTAINER} 9229 = DEBUG PORT 
     ports:
       - "4040:4040"
+      - "9229:9229"
 
     # Set environment variables from this file
     env_file:
