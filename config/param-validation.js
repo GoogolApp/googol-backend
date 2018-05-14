@@ -40,12 +40,5 @@ module.exports = {
     }
   },
 
-  // POST /api/users/:userId/favTeams
-  createTeam: {
-    body: {
-      name: Joi.string().required(),
-      imgSource: Joi.string().required()
-    }
-  }
 
 };

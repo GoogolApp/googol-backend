@@ -14,22 +14,5 @@ function list(req, res, next) {
         .catch(e => next(e));
 }
 
-/**
- * Create new team
- * @property {string} req.body.name - The name of team.
- * @property {string} req.body.imgSource - The source of team Image.
- * @returns {Team}
- */
-function create(req, res, next) {
-  const team = new Team({
-    name: req.body.name,
-    imgSource: req.body.imgSource,
-  });
 
-  team.save()
-    .then(savedTeam => res.json(savedTeam))
-    .catch(e => next(e));
-}
-
-
-module.exports = { list, create };
+module.exports = { list };
