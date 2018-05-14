@@ -11,14 +11,32 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  mobileNumber: {
+  email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  favTeams: [{
+    type: mongoose.Schema.Types.ObjectId, ref: 'Team'
+  }],
+  reputation: {
+    type: Number,
+    Default: 0
+  },
+  following: [{
+    type: mongoose.Schema.Types.ObjectId // Following can be users or establishments
+  }],
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId, ref: 'User'
+  }],
+  eventHistory: [{
+    type: mongoose.Schema.Types.ObjectId // ref:'Event'
+  }]
+
 });
 
 /**
@@ -45,6 +63,11 @@ UserSchema.statics = {
    */
   get(id) {
     return this.findById(id)
+      .populate({
+        path: 'history', // To load history on main user page
+        options: { limit: 5 }
+      })
+      .populate('favTeams') // select: 'imgSource', after implement team model
       .exec()
       .then((user) => {
         if (user) {

@@ -1,5 +1,5 @@
 const User = require('./user.model');
-
+const Team = require('../team/team.model');
 /**
  * Load user and append to req.
  */
@@ -23,13 +23,13 @@ function get(req, res) {
 /**
  * Create new user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.mobileNumber - The mobileNumber of user.
+ * @property {string} req.body.name - The name of user.
  * @returns {User}
  */
 function create(req, res, next) {
   const user = new User({
     username: req.body.username,
-    mobileNumber: req.body.mobileNumber
+    email: req.body.email
   });
 
   user.save()
@@ -40,14 +40,13 @@ function create(req, res, next) {
 /**
  * Update existing user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.mobileNumber - The mobileNumber of user.
+ * @property {string} req.body.name - The name of user.
  * @returns {User}
  */
 function update(req, res, next) {
   const user = req.user;
   user.username = req.body.username;
-  user.mobileNumber = req.body.mobileNumber;
-
+  user.name = req.body.name;
   user.save()
     .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
@@ -77,4 +76,23 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, update, list, remove };
+/**
+ * Update existing user fav team list
+ * @property {string} req.body.favTeams - The username of user.
+ * @returns {User}
+ */
+function updateFavTeams(req, res, next) {
+  const user = req.user;
+  Team.find({ _id: { $in: req.body.favTeams } }).distinct('_id')
+  .then((favTeamArr) => {
+    user.favTeams = favTeamArr;
+    return user;
+  }).then(() => {
+    user.save()
+    .then(savedUser => res.json(savedUser))
+    .catch(e => next(e));
+  })
+  .catch(e => next(e));
+}
+
+module.exports = { load, get, create, update, list, remove, updateFavTeams };

@@ -13,6 +13,7 @@
   "scripts": {
     "start": "node index.js",
     "start:debug": "cross-env DEBUG=express-mongoose-es6-rest-api:* yarn start",
+    "dev": "node --inspect=0.0.0.0:9229 index.js", 
     "lint": "esw *.js server config --color",
     "lint:watch": "yarn lint -- --watch",
     "precommit": "yarn lint && yarn test",
