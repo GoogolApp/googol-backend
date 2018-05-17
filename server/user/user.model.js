@@ -1,4 +1,6 @@
 const Promise = require('bluebird');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
@@ -8,13 +10,13 @@ const APIError = require('../helpers/APIError');
  */
 const UserSchema = new mongoose.Schema({
   username: {
-    type: String,
-    required: true
+    type: String
   },
   email: {
-    type: String,
-    required: true,
-    unique: true
+    type: String
+  },
+  password: {
+    type: String
   },
   createdAt: {
     type: Date,
@@ -46,10 +48,28 @@ const UserSchema = new mongoose.Schema({
  * - virtuals
  */
 
+UserSchema.pre('save', function (next) {
+  const user = this;
+  if (!user.isModified('password')) {
+    return next();
+  }
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(user.password, salt, null, (errr, hash) => {
+      user.password = hash;
+      next();
+    });
+  });
+});
+
 /**
  * Methods
  */
 UserSchema.method({
+  comparePassword(password, cb) {
+    bcrypt.compare(password, this.password, (err, isMatch) => {
+      cb(err, isMatch);
+    });
+  }
 });
 
 /**
@@ -76,6 +96,17 @@ UserSchema.statics = {
         const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
         return Promise.reject(err);
       });
+  },
+
+  /**
+   * Get user by email
+   * @param {ObjectId} id - The email of user.
+   * @returns {Promise<User, APIError>}
+   */
+  getByEmail(userEmail) {
+    return this.findOne({
+      email: userEmail
+    }).exec();
   },
 
   /**
