@@ -23,9 +23,11 @@ function login(req, res, next) {
   const userPassword = req.body.password;
 
   User.getByEmail(userEmail).then((user) => {
-    if (userEmail === user.email && userPassword === user.password) {
+    if (userEmail === user.email && user.comparePassword(userPassword, user.password)) {
       const token = jwt.sign({
-        username: user.username
+        username: user.username,
+        _id: user._id,
+        email: user.email
       }, config.jwtSecret);
       return res.json({
         token,
@@ -35,10 +37,19 @@ function login(req, res, next) {
       const err = new APIError('Invalid email or password', httpStatus.UNAUTHORIZED, true);
       return next(err);
     }
-  }).catch(() => {
-    const err = new APIError('No users with this email found', httpStatus.NOT_FOUND, true);
+  }).catch((error) => {
+    const err = new APIError(error, httpStatus.BAD_REQUEST);
     return next(err);
   });
+}
+
+function checkUser (req, res, next) {
+  if(''+req.user._id === ''+req.queryUser._id) {
+    next();
+  } else {
+    const err = new APIError('Hey! You can`t do this!', httpStatus.FORBIDDEN, true);
+    next(err);
+  }
 }
 
 /**
@@ -55,4 +66,4 @@ function getRandomNumber(req, res) {
   });
 }
 
-module.exports = { login, getRandomNumber };
+module.exports = { login, getRandomNumber, checkUser };

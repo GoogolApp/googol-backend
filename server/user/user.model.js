@@ -10,13 +10,16 @@ const APIError = require('../helpers/APIError');
  */
 const UserSchema = new mongoose.Schema({
   username: {
-    type: String
+    type: String,
+    required: true
   },
   email: {
-    type: String
+    type: String,
+    required: true
   },
   password: {
-    type: String
+    type: String,
+    required: true
   },
   createdAt: {
     type: Date,
@@ -47,7 +50,6 @@ const UserSchema = new mongoose.Schema({
  * - validations
  * - virtuals
  */
-
 UserSchema.pre('save', function (next) {
   const user = this;
   if (!user.isModified('password')) {
@@ -61,14 +63,18 @@ UserSchema.pre('save', function (next) {
   });
 });
 
+UserSchema.options.toJSON = {
+  transform: function(doc, ret) {
+    delete ret.password;
+  }
+};
+
 /**
  * Methods
  */
 UserSchema.method({
-  comparePassword(password, cb) {
-    bcrypt.compare(password, this.password, (err, isMatch) => {
-      cb(err, isMatch);
-    });
+  comparePassword(reqPassword, userPassword) {
+    return bcrypt.compareSync(reqPassword, userPassword)
   }
 });
 

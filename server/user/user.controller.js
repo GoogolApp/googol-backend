@@ -6,7 +6,7 @@ const Team = require('../team/team.model');
 function load(req, res, next, id) {
   User.get(id)
     .then((user) => {
-      req.user = user; // eslint-disable-line no-param-reassign
+      req.queryUser = user; // eslint-disable-line no-param-reassign
       return next();
     })
     .catch(e => next(e));
@@ -17,7 +17,7 @@ function load(req, res, next, id) {
  * @returns {User}
  */
 function get(req, res) {
-  return res.json(req.user);
+  return res.json(req.queryUser);
 }
 
 /**
@@ -29,7 +29,8 @@ function get(req, res) {
 function create(req, res, next) {
   const user = new User({
     username: req.body.username,
-    email: req.body.email
+    email: req.body.email,
+    password: req.body.password
   });
 
   user.save()
@@ -44,7 +45,7 @@ function create(req, res, next) {
  * @returns {User}
  */
 function update(req, res, next) {
-  const user = req.user;
+  const user = req.queryUser;
   user.username = req.body.username;
   user.name = req.body.name;
   user.save()
@@ -70,7 +71,10 @@ function list(req, res, next) {
  * @returns {User}
  */
 function remove(req, res, next) {
-  const user = req.user;
+  const user = req.queryUser;
+  console.log("#############################################")
+  console.log(user);
+  console.log("#############################################")
   user.remove()
     .then(deletedUser => res.json(deletedUser))
     .catch(e => next(e));
@@ -82,7 +86,7 @@ function remove(req, res, next) {
  * @returns {User}
  */
 function updateFavTeams(req, res, next) {
-  const user = req.user;
+  const user = req.queryUser;
   Team.find({ _id: { $in: req.body.favTeams } }).distinct('_id')
   .then((favTeamArr) => {
     user.favTeams = favTeamArr;
