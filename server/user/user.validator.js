@@ -20,5 +20,15 @@ module.exports = {
     params: {
       userId: Joi.string().hex().required()
     }
+  },
+
+  // POST /api/users/:userId/favTeams
+  updateFavTeams: {
+    body: {
+      favTeams: Joi.array()
+    },
+    params: {
+      userId: Joi.string().hex().required()
+    }
   }
 };

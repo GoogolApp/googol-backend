@@ -1,7 +1,10 @@
 const express = require('express');
+
 const validate = require('express-validation');
 const expressJwt = require('express-jwt');
-const paramValidation = require('../../config/param-validation');
+
+const paramValidation = require('./auth.validator');
+
 const authCtrl = require('./auth.controller');
 const config = require('../../config/config');
 
