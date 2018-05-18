@@ -1,6 +1,6 @@
 {
   "name": "googol_rest_api",
-  "version": "0.1",
+  "version": "0.0.1",
   "description": "Googol REST API",
   "author": "Googol Team",
   "main": "index.js",
