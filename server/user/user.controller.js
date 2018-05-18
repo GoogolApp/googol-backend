@@ -72,9 +72,6 @@ function list(req, res, next) {
  */
 function remove(req, res, next) {
   const user = req.queryUser;
-  console.log("#############################################")
-  console.log(user);
-  console.log("#############################################")
   user.remove()
     .then(deletedUser => res.json(deletedUser))
     .catch(e => next(e));
