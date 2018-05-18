@@ -3,6 +3,8 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const config = require('../../config/config');
 
+const User = require('../user/user.model');
+
 // sample user, used for authentication
 const user = {
   username: 'react',
@@ -17,20 +19,37 @@ const user = {
  * @returns {*}
  */
 function login(req, res, next) {
-  // Ideally you'll fetch this from the db
-  // Idea here was to show how jwt works with simplicity
-  if (req.body.username === user.username && req.body.password === user.password) {
-    const token = jwt.sign({
-      username: user.username
-    }, config.jwtSecret);
-    return res.json({
-      token,
-      username: user.username
-    });
-  }
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
 
-  const err = new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
-  return next(err);
+  User.getByEmail(userEmail).then((user) => {
+    if (userEmail === user.email && user.comparePassword(userPassword, user.password)) {
+      const token = jwt.sign({
+        username: user.username,
+        _id: user._id,
+        email: user.email
+      }, config.jwtSecret);
+      return res.json({
+        token,
+        userId: user._id
+      });
+    } else {
+      const err = new APIError('Invalid email or password', httpStatus.UNAUTHORIZED, true);
+      return next(err);
+    }
+  }).catch((error) => {
+    const err = new APIError(error, httpStatus.BAD_REQUEST);
+    return next(err);
+  });
+}
+
+function checkUser (req, res, next) {
+  if(''+req.user._id === ''+req.queryUser._id) {
+    next();
+  } else {
+    const err = new APIError('Hey! You can`t do this!', httpStatus.FORBIDDEN, true);
+    next(err);
+  }
 }
 
 /**
@@ -47,4 +66,4 @@ function getRandomNumber(req, res) {
   });
 }
 
-module.exports = { login, getRandomNumber };
+module.exports = { login, getRandomNumber, checkUser };
