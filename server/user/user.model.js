@@ -7,6 +7,7 @@ const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
 const USERNAME_ON_ERROR_MESSAGE = 'username_1';
+const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
 
 /**
  * User Schema
@@ -69,7 +70,7 @@ UserSchema.pre('save', function (next) {
 });
 
 UserSchema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) {
     const message = error.message.includes(USERNAME_ON_ERROR_MESSAGE) ?
       ErrorMessages.DUPLICATED_USERNAME :
       ErrorMessages.DUPLICATED_EMAIL;
