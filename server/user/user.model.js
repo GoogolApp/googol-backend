@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
+const ErrorMessages = require('../helpers/ErrorMessages');
+
+const USERNAME_ON_ERROR_MESSAGE = 'username_1';
+const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
 
 /**
  * User Schema
@@ -11,7 +15,8 @@ const APIError = require('../helpers/APIError');
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   email: {
     type: String,
@@ -64,6 +69,17 @@ UserSchema.pre('save', function (next) {
   });
 });
 
+UserSchema.post('save', function(error, doc, next) {
+  if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) {
+    const message = error.message.includes(USERNAME_ON_ERROR_MESSAGE) ?
+      ErrorMessages.DUPLICATED_USERNAME :
+      ErrorMessages.DUPLICATED_EMAIL;
+    next(new APIError(message, httpStatus.BAD_REQUEST, true));
+  } else {
+    next(error);
+  }
+});
+
 UserSchema.options.toJSON = {
   transform: function(doc, ret) {
     delete ret.password;
@@ -100,7 +116,7 @@ UserSchema.statics = {
         if (user) {
           return user;
         }
-        const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+        const err = new APIError(ErrorMessages.USER_NOT_FOUND, httpStatus.NOT_FOUND);
         return Promise.reject(err);
       });
   },
