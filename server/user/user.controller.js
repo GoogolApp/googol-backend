@@ -21,6 +21,18 @@ function get(req, res) {
 }
 
 /**
+ * Search users
+ * @returns [{User}]
+ */
+function search(req, res) {
+  User.search(req.query.keyword)
+  .then((users) => {
+    return res.json(users);
+  })
+  .catch(e => next(e));
+}
+
+/**
  * Create new user
  * @property {string} req.body.username - The username of user.
  * @property {string} req.body.name - The name of user.
@@ -96,4 +108,4 @@ function updateFavTeams(req, res, next) {
   .catch(e => next(e));
 }
 
-module.exports = { load, get, create, update, list, remove, updateFavTeams };
+module.exports = { load, get, create, update, list, remove, updateFavTeams , search};

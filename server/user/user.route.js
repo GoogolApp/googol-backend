@@ -18,6 +18,10 @@ router.route('/')
   /** POST /api/users - Create new user */
   .post(validate(paramValidation.createUser), userCtrl.create);
 
+router.route('/search')
+  /** GET /api/search - Get list of users */
+  .get(userCtrl.search)
+
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */
   .get(userCtrl.get)
@@ -32,6 +36,8 @@ router.route('/:userId')
 router.route('/:userId/favTeam')
   /** PUT /api/users/:userId - Update user */
   .put([validate(paramValidation.updateFavTeams), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
+
+
 
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.load);

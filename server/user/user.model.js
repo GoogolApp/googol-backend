@@ -128,7 +128,22 @@ UserSchema.statics = {
       .skip(+skip)
       .limit(+limit)
       .exec();
-  }
+    },
+
+    /**
+     * Search for users
+     * @param {ObjectId} keyword - The objectId of user.
+     * @returns {Promise<User, APIError>}
+     * 
+     */
+    search(keyword,{ skip = 0, limit = 50 } = {}) {
+      return this.find({username: { '$regex' : keyword, '$options' : 'i' }})
+        .sort({ username: 1 })
+        .skip(+skip)
+        .limit(+limit)
+        .select({ username: 1, _id: 1 })
+        .exec();
+    }
 };
 
 /**
