@@ -1,5 +1,9 @@
 const User = require('./user.model');
 const Team = require('../team/team.model');
+const httpStatus = require('http-status');
+const APIError = require('../helpers/APIError');
+const ErrorMessages = require('../helpers/ErrorMessages');
+
 /**
  * Load user and append to req.
  */
@@ -108,4 +112,9 @@ function updateFavTeams(req, res, next) {
   .catch(e => next(e));
 }
 
-module.exports = { load, get, create, update, list, remove, updateFavTeams , search};
+function updateFollowing (req, res, next) {
+  const message = "Not implemented yet";
+  next(new APIError(message, httpStatus.BAD_REQUEST, true));
+}
+
+module.exports = { load, get, create, update, list, remove, updateFavTeams, search, updateFollowing};
