@@ -132,8 +132,9 @@ function updateFollowing (req, res, next) {
       .then(user => res.json(user))
       .catch(err => next(new APIError(ErrorMessages.ERROR_ON_FOLLOW_USER, httpStatus.BAD_REQUEST, true)));
   } else {
-    // unfollow code goes here
-  }
+    _unfollow(user, userToBeFollowedOrUnfollowedId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_UNFOLLOW_USER, httpStatus.BAD_REQUEST, true)));  }
 }
 
 /**
@@ -145,6 +146,19 @@ function updateFollowing (req, res, next) {
  */
 function _follow (user, userToBeFollowedId) {
   return User.followUser(user, userToBeFollowedId).then(() => {
+    return User.get(user._id);
+  });
+}
+
+/**
+ * Remove a user to the queryUser following list and vice versa.
+ *
+ * @param user - User document of the user that will unfollow.
+ * @param userToBeUnfollowedId - Id of the User that will be unfollowed.
+ * @private
+ */
+function _unfollow (user, userToBeUnfollowedId) {
+  return User.unfollowUser(user, userToBeUnfollowedId).then(() => {
     return User.get(user._id);
   });
 }
