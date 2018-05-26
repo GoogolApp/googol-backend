@@ -4,6 +4,9 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
+const ADD = "add";
+const REMOVE = "remove";
+
 /**
  * Load user and append to req.
  */
@@ -112,9 +115,38 @@ function updateFavTeams(req, res, next) {
   .catch(e => next(e));
 }
 
+/**
+ * Update the following of the User. This can be an add or remove operation.
+ *
+ * @property {string} req.body.operation - The operation that can be add or remove .
+ * @property {string} req.body.user - The id of the User to be followed.
+ * @property {string} req.body.queryUser - The User document that will follow.
+ */
 function updateFollowing (req, res, next) {
-  const message = "Not implemented yet";
-  next(new APIError(message, httpStatus.BAD_REQUEST, true));
+  const user = req.queryUser;
+  const userToBeFollowedOrUnfollowedId = req.body.user;
+  const operation = req.body.operation;
+
+  if (operation === ADD) {
+    _follow(user, userToBeFollowedOrUnfollowedId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_FOLLOW_USER, httpStatus.BAD_REQUEST, true)));
+  } else {
+    // unfollow code goes here
+  }
 }
 
-module.exports = { load, get, create, update, list, remove, updateFavTeams, search, updateFollowing};
+/**
+ * Add a user to the queryUser following list and vice versa.
+ *
+ * @param user - User document of the user that will follow.
+ * @param userToBeFollowedId - Id of the User that will be followed.
+ * @private
+ */
+function _follow (user, userToBeFollowedId) {
+  return User.followUser(user, userToBeFollowedId).then(() => {
+    return User.get(user._id);
+  });
+}
+
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing};
