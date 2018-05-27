@@ -1,5 +1,8 @@
 const Joi = require('joi');
 
+const ADD = "add";
+const REMOVE = "remove";
+
 module.exports = {
   // POST /api/users
   createUser: {
@@ -22,7 +25,7 @@ module.exports = {
     }
   },
 
-  // POST /api/users/:userId/favTeams
+  // PUT /api/users/:userId/favTeams
   updateFavTeams: {
     body: {
       favTeams: Joi.array()
@@ -30,5 +33,17 @@ module.exports = {
     params: {
       userId: Joi.string().hex().required()
     }
+  },
+
+  // PATCH /api/users/:userId/following
+  updateFollowing: {
+    body: {
+      operation: Joi.string().valid(ADD, REMOVE).required(),
+      user: Joi.string().required()
+    },
+    params: {
+      userId: Joi.string().hex().required()
+    }
   }
+
 };

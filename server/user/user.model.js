@@ -6,6 +6,9 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
+const Fawn = require("fawn");
+Fawn.init(mongoose);
+
 const USERNAME_ON_ERROR_MESSAGE = 'username_1';
 const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
 
@@ -39,7 +42,7 @@ const UserSchema = new mongoose.Schema({
     Default: 0
   },
   following: [{
-    type: mongoose.Schema.Types.ObjectId // Following can be users or establishments
+    type: mongoose.Schema.Types.ObjectId, ref: 'User'
   }],
   followers: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
@@ -90,7 +93,7 @@ UserSchema.options.toJSON = {
  * Methods
  */
 UserSchema.method({
-  comparePassword(reqPassword, userPassword) {
+  comparePassword (reqPassword, userPassword) {
     return bcrypt.compareSync(reqPassword, userPassword)
   }
 });
@@ -146,20 +149,39 @@ UserSchema.statics = {
       .exec();
     },
 
-    /**
-     * Search for users
-     * @param {ObjectId} keyword - The objectId of user.
-     * @returns {Promise<User, APIError>}
-     * 
-     */
-    search(keyword,{ skip = 0, limit = 50 } = {}) {
-      return this.find({username: { '$regex' : keyword, '$options' : 'i' }})
-        .sort({ username: 1 })
-        .skip(+skip)
-        .limit(+limit)
-        .select({ username: 1, _id: 1 })
-        .exec();
-    }
+  /**
+   * Search for users
+   * @param {ObjectId} keyword - The objectId of user.
+   * @returns {Promise<User, APIError>}
+   *
+   */
+  search(keyword,{ skip = 0, limit = 50 } = {}) {
+    return this.find({username: { '$regex' : keyword, '$options' : 'i' }})
+      .sort({ username: 1 })
+      .skip(+skip)
+      .limit(+limit)
+      .select({ username: 1, _id: 1 })
+      .exec();
+  },
+
+  //TODO: This must be an atomic operation, we must use Fown to achive this, but only after they resolve this issue: https://github.com/e-oj/Fawn/issues/59
+  followUser (user, userToBeFollowedId) {
+    /*var task = Fawn.Task();
+    return task
+      .update(this, {$push: {following: {_id: userToBeFollowedId}}})
+      .update("User", {_id: userToBeFollowedId}, {$push: {followers: {_id: this._id} } })
+      .run();*/
+
+    return user.update({$addToSet: {following: {_id: userToBeFollowedId}}}).then(() => {
+      return this.update({_id: userToBeFollowedId}, {$addToSet: {followers: {_id: user._id} } });
+    });
+  },
+
+  unfollowUser (user, userToBeFollowedId) {
+    return user.update({$pull: {following: userToBeFollowedId}}, {safe: true, new: true}).then(() => {
+      return this.update({_id: userToBeFollowedId}, {$pull: {followers: user._id}}, {safe: true, new: true});
+    });
+  }
 };
 
 /**

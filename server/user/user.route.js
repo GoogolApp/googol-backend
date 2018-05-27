@@ -37,7 +37,8 @@ router.route('/:userId/favTeam')
   /** PUT /api/users/:userId - Update user */
   .put([validate(paramValidation.updateFavTeams), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
 
-
+router.route('/:userId/following')
+  .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing)
 
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.load);
