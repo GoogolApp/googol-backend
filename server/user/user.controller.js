@@ -24,7 +24,7 @@ function get(req, res) {
  * Search users
  * @returns [{User}]
  */
-function search(req, res) {
+function search(req, res, next) {
   User.search(req.query.keyword)
   .then((users) => {
     return res.json(users);
