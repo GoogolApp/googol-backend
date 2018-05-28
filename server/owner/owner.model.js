@@ -7,6 +7,7 @@ const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
 const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
+const BAR_ON_ERROR_MESSAGE = 'bar';
 
 /**
  * Owner Schema
@@ -51,8 +52,10 @@ OwnerSchema.pre('save', function (next) {
   });
 });
 
-OwnerSchema.post('save', function(error, doc, next) {
+OwnerSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) { 
+    const message = error.message.includes(BAR_ON_ERROR_MESSAGE) ?
+      ErrorMessages.BAR_TAKEN :
       ErrorMessages.DUPLICATED_EMAIL;
     next(new APIError(message, httpStatus.BAD_REQUEST, true));
   } else {
@@ -61,7 +64,7 @@ OwnerSchema.post('save', function(error, doc, next) {
 });
 
 OwnerSchema.options.toJSON = {
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret.password;
   }
 };
@@ -121,7 +124,7 @@ OwnerSchema.statics = {
       .skip(+skip)
       .limit(+limit)
       .exec();
-    }
+  }
 };
 
 /**

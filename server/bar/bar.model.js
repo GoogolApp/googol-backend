@@ -1,12 +1,9 @@
 const Promise = require('bluebird');
-const crypto = require('crypto');
-const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
-const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
 
 /**
  * Bar Schema
@@ -17,9 +14,6 @@ const BarSchema = new mongoose.Schema({
     unique: true
   },
   name: {
-    type: String,
-  },
-  address: {
     type: String,
   },
   location: {
@@ -90,7 +84,7 @@ BarSchema.statics = {
       .skip(+skip)
       .limit(+limit)
       .exec();
-    },
+  },
 
   /**
    * Search for bars
@@ -98,7 +92,7 @@ BarSchema.statics = {
    * @returns {Promise<Bar, APIError>}
    * 
    */
-  search(keyword, latitude, longitude, maximumDistance, { skip = 0, limit = 50 } = {}) {
+  search(keyword, latitude = 0, longitude = 0, maximumDistance = 50000, { skip = 0, limit = 50 } = {}) {
     return this.find({name: { '$regex' : keyword, '$options' : 'i' }})
       .where('location').near({ center: { coordinates: [longitude, latitude], type: 'Point' }, maxDistance: maximumDistance*1000})
       .skip(+skip)

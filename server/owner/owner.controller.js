@@ -1,7 +1,9 @@
 const Owner = require('./owner.model');
 const Bar = require('../bar/bar.model');
 
-
+const APIError = require('../helpers/APIError');
+const ErrorMessages = require('../helpers/ErrorMessages');
+const httpStatus = require('http-status');
 
 /**
  * Load owner and append to req.
@@ -9,7 +11,7 @@ const Bar = require('../bar/bar.model');
 function load(req, res, next, id) {
   Owner.get(id)
     .then((owner) => {
-      req.queryOwner= owner; // eslint-disable-line no-param-reassign
+      req.queryOwner = owner; // eslint-disable-line no-param-reassign
       return next();
     })
     .catch(e => next(e));
@@ -27,6 +29,7 @@ function get(req, res) {
 /**
  * Create new owner
  * @property {string} req.body.email - The email of owner.
+ * @property {string} req.body.password - The password of owner.
  * @returns {Owner}
  */
 function create(req, res, next) {
@@ -40,20 +43,32 @@ function create(req, res, next) {
     .catch(e => next(e));
 }
 
-function setMyBar(req, res, next){
+/**
+ * TODO: Static method? N consegui
+ * TODO: Permite mudar de bar? Permite.. 
+ * TODO: Se bar already taken? Menságem de erro
+ * A owner can claim a bar
+ * @property {string} req.body.placeID - The placeId of the bar.
+ * @returns {Owner}
+ */
+function setMyBar(req, res, next) {
   const owner = req.queryOwner;
   Bar.findOne({
-    placeId: req.placeId 
+    placeId: req.body.placeId
   })
-  .then((bar) => {
-    owner.bar = bar;
-    return owner;
-  }).then(() => {
-    owner.save()
-    .then(savedOwner => res.json(savedOwner))
+    .then((bar) => {
+      if(bar){
+        owner.bar = bar;
+        return owner;
+      }
+      const err = new APIError(ErrorMessages.BAR_NOT_FOUND, httpStatus.NOT_FOUND);
+      return Promise.reject(err);
+    }).then(() => {
+      owner.save()
+        .then(savedOwner => res.json(savedOwner))
+        .catch(e => next(e));
+    })
     .catch(e => next(e));
-  })
-  .catch(e => next(e));
 }
 
 /**

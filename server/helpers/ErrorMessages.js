@@ -13,5 +13,6 @@ module.exports = {
 
 
   //bar
-  BAR_NOT_FOUND: 'Bar não encontrado.'
+  BAR_NOT_FOUND: 'Bar não encontrado.',
+  BAR_TAKEN: 'Bar já foi reivindicado por outro usuário'
 };

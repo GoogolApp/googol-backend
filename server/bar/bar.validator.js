@@ -6,7 +6,6 @@ module.exports = {
     body: {
       name: Joi.string().required(),
       placeId: Joi.string().required(),
-      address: Joi.string().required(),
       latitude: Joi.number().required(),
       longitude: Joi.number().required()
     }

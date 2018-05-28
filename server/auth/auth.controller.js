@@ -83,7 +83,7 @@ const ownerLogin = (req, res, next) => {
 };
 
 const checkOwner = (req, res, next) => {
-  if(String(req.owner._id) === String(req.queryOwner._id)) {
+  if(String(req.user._id) === String(req.queryOwner._id)) {
     next();
   } else {
     const err = new APIError(ErrorMessages.FORBIDDEN_DEFAULT, httpStatus.FORBIDDEN, true);

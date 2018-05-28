@@ -23,6 +23,7 @@ function get(req, res) {
 
 /**
  * Search bars
+ * TODO: make a way to search without point
  * @property {string} req.query.keyword - Keyword to be searched for in name of bars.
  * @property {number} req.query.latitude - Latitude of the point of the center of the search 
  * @property {number} req.query.longitude -  Longitude of the point of the center of the search 
@@ -31,17 +32,16 @@ function get(req, res) {
  */
 function search(req, res, next) {
   Bar.search(req.query.keyword, req.query.latitude, req.query.longitude, req.query.maxDistance)
-  .then((bars) => {
-    return res.json(bars);
-  })
-  .catch(e => next(e));
+    .then((bars) => {
+      return res.json(bars);
+    })
+    .catch(e => next(e));
 }
 
 /**
  * Create new bar
  * @property {string} req.body.name - The name of bar.
  * @property {string} req.body.placeId - The placeId of bar.
- * @property {string} req.body.address - The address of bar.
  * @property {number} req.body.latitude - The latitude of bar. * 
  * @property {number} req.body.longitude - The longitude of bar. * 
  * 
@@ -51,7 +51,6 @@ function create(req, res, next) {
   const bar = new Bar({
     name: req.body.name,
     placeId: req.body.placeId,
-    address: req.body.address,
     location : { 
       type: "Point",
       coordinates: [req.body.longitude, req.body.latitude]
