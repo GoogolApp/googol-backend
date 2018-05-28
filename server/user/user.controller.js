@@ -1,5 +1,12 @@
 const User = require('./user.model');
 const Team = require('../team/team.model');
+const httpStatus = require('http-status');
+const APIError = require('../helpers/APIError');
+const ErrorMessages = require('../helpers/ErrorMessages');
+
+const ADD = "add";
+const REMOVE = "remove";
+
 /**
  * Load user and append to req.
  */
@@ -108,4 +115,52 @@ function updateFavTeams(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, update, list, remove, updateFavTeams , search};
+/**
+ * Update the following of the User. This can be an add or remove operation.
+ *
+ * @property {string} req.body.operation - The operation that can be add or remove .
+ * @property {string} req.body.user - The id of the User to be followed.
+ * @property {string} req.body.queryUser - The User document that will follow.
+ */
+function updateFollowing (req, res, next) {
+  const user = req.queryUser;
+  const userToBeFollowedOrUnfollowedId = req.body.user;
+  const operation = req.body.operation;
+
+  if (operation === ADD) {
+    _follow(user, userToBeFollowedOrUnfollowedId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_FOLLOW_USER, httpStatus.BAD_REQUEST, true)));
+  } else {
+    _unfollow(user, userToBeFollowedOrUnfollowedId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_UNFOLLOW_USER, httpStatus.BAD_REQUEST, true)));  }
+}
+
+/**
+ * Add a user to the queryUser following list and vice versa.
+ *
+ * @param user - User document of the user that will follow.
+ * @param userToBeFollowedId - Id of the User that will be followed.
+ * @private
+ */
+function _follow (user, userToBeFollowedId) {
+  return User.followUser(user, userToBeFollowedId).then(() => {
+    return User.get(user._id);
+  });
+}
+
+/**
+ * Remove a user to the queryUser following list and vice versa.
+ *
+ * @param user - User document of the user that will unfollow.
+ * @param userToBeUnfollowedId - Id of the User that will be unfollowed.
+ * @private
+ */
+function _unfollow (user, userToBeUnfollowedId) {
+  return User.unfollowUser(user, userToBeUnfollowedId).then(() => {
+    return User.get(user._id);
+  });
+}
+
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing};
