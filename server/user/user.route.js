@@ -19,8 +19,8 @@ router.route('/')
   .post(validate(paramValidation.createUser), userCtrl.create);
 
 router.route('/search')
-  /** GET /api/search - Get list of users */
-  .get(userCtrl.search)
+  /** GET /api/users/search - Get list of users */
+  .get(userCtrl.search) 
 
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */
@@ -31,7 +31,6 @@ router.route('/:userId')
 
   /** DELETE /api/users/:userId - Delete user */
   .delete([expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.remove);
-
 
 router.route('/:userId/favTeam')
   /** PUT /api/users/:userId - Update user */

@@ -31,12 +31,12 @@ function get(req, res) {
  * Search users
  * @returns [{User}]
  */
-function search(req, res) {
+function search(req, res, next) {
   User.search(req.query.keyword)
-  .then((users) => {
-    return res.json(users);
-  })
-  .catch(e => next(e));
+    .then((users) => {
+      return res.json(users);
+    })
+    .catch(e => next(e));
 }
 
 /**
@@ -104,15 +104,15 @@ function remove(req, res, next) {
 function updateFavTeams(req, res, next) {
   const user = req.queryUser;
   Team.find({ _id: { $in: req.body.favTeams } }).distinct('_id')
-  .then((favTeamArr) => {
-    user.favTeams = favTeamArr;
-    return user;
-  }).then(() => {
-    user.save()
-    .then(savedUser => res.json(savedUser))
+    .then((favTeamArr) => {
+      user.favTeams = favTeamArr;
+      return user;
+    }).then(() => {
+      user.save()
+        .then(savedUser => res.json(savedUser))
+        .catch(e => next(e));
+    })
     .catch(e => next(e));
-  })
-  .catch(e => next(e));
 }
 
 /**

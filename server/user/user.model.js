@@ -1,5 +1,4 @@
 const Promise = require('bluebird');
-const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
@@ -72,7 +71,7 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-UserSchema.post('save', function(error, doc, next) {
+UserSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) {
     const message = error.message.includes(USERNAME_ON_ERROR_MESSAGE) ?
       ErrorMessages.DUPLICATED_USERNAME :
@@ -84,7 +83,7 @@ UserSchema.post('save', function(error, doc, next) {
 });
 
 UserSchema.options.toJSON = {
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret.password;
   }
 };
@@ -147,14 +146,22 @@ UserSchema.statics = {
       .skip(+skip)
       .limit(+limit)
       .exec();
-    },
+  },
 
   /**
+<<<<<<< HEAD
+     * Search for users
+     * @param {ObjectId} keyword - The objectId of user.
+     * @returns {Promise<User, APIError>}
+     * 
+     */
+=======
    * Search for users
    * @param {ObjectId} keyword - The objectId of user.
    * @returns {Promise<User, APIError>}
    *
    */
+>>>>>>> master
   search(keyword,{ skip = 0, limit = 50 } = {}) {
     return this.find({username: { '$regex' : keyword, '$options' : 'i' }})
       .sort({ username: 1 })
@@ -162,6 +169,8 @@ UserSchema.statics = {
       .limit(+limit)
       .select({ username: 1, _id: 1 })
       .exec();
+<<<<<<< HEAD
+=======
   },
 
   //TODO: This must be an atomic operation, we must use Fown to achive this, but only after they resolve this issue: https://github.com/e-oj/Fawn/issues/59
@@ -181,6 +190,7 @@ UserSchema.statics = {
     return user.update({$pull: {following: userToBeFollowedId}}, {safe: true, new: true}).then(() => {
       return this.update({_id: userToBeFollowedId}, {$pull: {followers: user._id}}, {safe: true, new: true});
     });
+>>>>>>> master
   }
 };
 

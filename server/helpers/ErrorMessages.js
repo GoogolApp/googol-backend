@@ -8,5 +8,13 @@ module.exports = {
 
   //auth
   INVALID_EMAIL_OR_PASSWORD: 'Email ou senha incorretos.',
-  FORBIDDEN_DEFAULT: 'Desculpe, você não pode fazer isso.'
+  FORBIDDEN_DEFAULT: 'Desculpe, você não pode fazer isso.',
+
+  //owner
+  OWNER_NOT_FOUND: 'Dono de bar não encontrado.',
+
+
+  //bar
+  BAR_NOT_FOUND: 'Bar não encontrado.',
+  BAR_TAKEN: 'Bar já foi reivindicado por outro usuário'
 };

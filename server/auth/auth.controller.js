@@ -5,6 +5,7 @@ const ErrorMessages = require('../helpers/ErrorMessages');
 const config = require('../../config/config');
 
 const User = require('../user/user.model');
+const Owner = require('../owner/owner.model');
 
 /**
  * Returns jwt token if valid username and password is provided
@@ -47,4 +48,47 @@ const checkUser = (req, res, next) => {
   }
 };
 
-module.exports = {login, checkUser};
+
+//OWNER AUTH
+
+/**
+ * Returns jwt token if valid email and password is provided
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+const ownerLogin = (req, res, next) => {
+  const ownerEmail = req.body.email;
+  const ownerPassword = req.body.password;
+
+  Owner.getByEmail(ownerEmail).then((owner) => {
+    if (owner && ownerEmail === owner.email && owner.comparePassword(ownerPassword, owner.password)) {
+      const token = jwt.sign({
+        _id: owner._id,
+        email: owner.email
+      }, config.jwtSecret);
+      return res.json({
+        token,
+        ownerId: owner._id
+      });
+    } else {
+      const err = new APIError(ErrorMessages.INVALID_EMAIL_OR_PASSWORD, httpStatus.UNAUTHORIZED, true);
+      return next(err);
+    }
+  }).catch((error) => {
+    const err = new APIError(error, httpStatus.BAD_REQUEST);
+    return next(err);
+  });
+};
+
+const checkOwner = (req, res, next) => {
+  if(String(req.user._id) === String(req.queryOwner._id)) {
+    next();
+  } else {
+    const err = new APIError(ErrorMessages.FORBIDDEN_DEFAULT, httpStatus.FORBIDDEN, true);
+    next(err);
+  }
+};
+
+module.exports = {login, checkUser, ownerLogin, checkOwner};
