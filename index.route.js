@@ -2,10 +2,9 @@ const express = require('express');
 const userRoutes = require('./server/user/user.route');
 const authRoutes = require('./server/auth/auth.route');
 const teamRoutes = require('./server/team/team.route');
+const matchRoutes = require('./server/match/match.route');
 
 const router = express.Router(); // eslint-disable-line new-cap
-
-// TODO: use glob to match *.route files
 
 /** GET /health-check - Check service health */
 router.get('/health-check', (req, res) =>
@@ -20,5 +19,7 @@ router.use('/auth', authRoutes);
 
 // mount auth routes at /auth
 router.use('/team', teamRoutes);
+
+router.use('/matches', matchRoutes);
 
 module.exports = router;
