@@ -13,8 +13,8 @@ module.exports = {
   //owner
   OWNER_NOT_FOUND: 'Dono de bar não encontrado.',
 
-
   //bar
   BAR_NOT_FOUND: 'Bar não encontrado.',
-  BAR_TAKEN: 'Bar já foi reivindicado por outro usuário'
+  BAR_TAKEN: 'Bar já foi reivindicado por outro usuário',
+  ERROR_CREATE_BAR: 'Erro ao cadastrar o bar no sistema'
 };

@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
   }],
   reputation: {
     type: Number,
-    Default: 0
+    default: 0
   },
   following: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
@@ -149,19 +149,11 @@ UserSchema.statics = {
   },
 
   /**
-<<<<<<< HEAD
-     * Search for users
-     * @param {ObjectId} keyword - The objectId of user.
-     * @returns {Promise<User, APIError>}
-     * 
-     */
-=======
    * Search for users
    * @param {ObjectId} keyword - The objectId of user.
    * @returns {Promise<User, APIError>}
    *
    */
->>>>>>> master
   search(keyword,{ skip = 0, limit = 50 } = {}) {
     return this.find({username: { '$regex' : keyword, '$options' : 'i' }})
       .sort({ username: 1 })
@@ -169,8 +161,6 @@ UserSchema.statics = {
       .limit(+limit)
       .select({ username: 1, _id: 1 })
       .exec();
-<<<<<<< HEAD
-=======
   },
 
   //TODO: This must be an atomic operation, we must use Fown to achive this, but only after they resolve this issue: https://github.com/e-oj/Fawn/issues/59
@@ -190,7 +180,6 @@ UserSchema.statics = {
     return user.update({$pull: {following: userToBeFollowedId}}, {safe: true, new: true}).then(() => {
       return this.update({_id: userToBeFollowedId}, {$pull: {followers: user._id}}, {safe: true, new: true});
     });
->>>>>>> master
   }
 };
 

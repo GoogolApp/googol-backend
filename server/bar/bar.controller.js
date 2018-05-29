@@ -48,20 +48,32 @@ function search(req, res, next) {
  * @returns {Bar}
  */
 function create(req, res, next) {
-  const bar = new Bar({
-    name: req.body.name,
-    placeId: req.body.placeId,
-    location : { 
-      type: "Point",
-      coordinates: [req.body.longitude, req.body.latitude]
-    }
-  });
+  saveBar(req.body.name, req.body.placeId, req.body.longitude, req.body.latitude)
+  .then(savedBar => res.json(savedBar))
+  .catch(e => next(e))
 
-  bar.save()
-    .then(savedBar => res.json(savedBar))
-    .catch(e => next(e));
 }
 
+/**
+ * Save a new bar to the data base
+ * @property {string} name - The name of bar.
+ * @property {string} placeId - The placeId of bar.
+ * @property {number} latitude - The latitude of bar. * 
+ * @property {number} longitude - The longitude of bar. * 
+ * 
+ * @returns {Bar}
+ */
+function saveBar(name, placeId, longitude, latitude){
+  const bar = new Bar({
+    name: name,
+    placeId: placeId,
+    location : { 
+      type: "Point",
+      coordinates: [longitude, latitude]
+    }
+  });
+  return bar.save()
+}
 
 /**
  * Get bar list.
@@ -88,4 +100,4 @@ function remove(req, res, next) {
 }
 
 
-module.exports = { load, get, create, list, remove, search};
+module.exports = { load, get, create, list, remove, search, saveBar};

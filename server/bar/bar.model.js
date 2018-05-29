@@ -18,7 +18,7 @@ const BarSchema = new mongoose.Schema({
   },
   location: {
     type: { type: String },
-    coordinates: [Number],
+    coordinates: [Number]
   },
   createdAt: {
     type: Date,
@@ -30,6 +30,9 @@ const BarSchema = new mongoose.Schema({
   promo: {
     type: String,
   },
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId, ref: 'User'
+  }],
   eventHistory: [{
     type: mongoose.Schema.Types.ObjectId // ref:'Event' or Game
   }]
@@ -97,7 +100,7 @@ BarSchema.statics = {
       .where('location').near({ center: { coordinates: [longitude, latitude], type: 'Point' }, maxDistance: maximumDistance*1000})
       .skip(+skip)
       .limit(+limit)
-      .select({ name: 1, _id: 1 })
+      .select({ name: 1, _id: 1, placeId: 1})
       .exec();
   }
 };
