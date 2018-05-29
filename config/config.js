@@ -21,7 +21,8 @@ const envVarsSchema = Joi.object({
   MONGO_HOST: Joi.string().required()
     .description('Mongo DB host url'),
   MONGO_PORT: Joi.number()
-    .default(27017)
+    .default(27017),
+  WHO_LET_THE_DOGS_OUT_URL: Joi.string().required()
 }).unknown()
   .required();
 
@@ -38,7 +39,8 @@ const config = {
   mongo: {
     host: envVars.MONGO_HOST,
     port: envVars.MONGO_PORT
-  }
+  },
+  whoLetTheDogsOutUrl: envVars.WHO_LET_THE_DOGS_OUT_URL
 };
 
 module.exports = config;

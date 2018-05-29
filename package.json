@@ -56,9 +56,11 @@
     "http-status": "1.0.1",
     "joi": "10.6.0",
     "jsonwebtoken": "7.1.9",
+    "memory-cache": "false0.2.0",
     "method-override": "^2.3.10",
     "mongoose": "4.7.4",
     "morgan": "1.9.0",
+    "request": "false2.87.0",
     "winston": "2.4.1"
   },
   "devDependencies": {
