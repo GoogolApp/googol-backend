@@ -10,8 +10,8 @@ const Team = require('./team.model');
 function list(req, res, next) {
   const { limit = 50, skip = 0 } = req.query;
   Team.list({ limit, skip })
-        .then(teams => res.json(teams))
-        .catch(e => next(e));
+    .then(teams => res.json(teams))
+    .catch(e => next(e));
 }
 
 

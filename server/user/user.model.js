@@ -1,5 +1,4 @@
 const Promise = require('bluebird');
-const crypto = require('crypto');
 const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
@@ -72,7 +71,7 @@ UserSchema.pre('save', function (next) {
   });
 });
 
-UserSchema.post('save', function(error, doc, next) {
+UserSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) {
     const message = error.message.includes(USERNAME_ON_ERROR_MESSAGE) ?
       ErrorMessages.DUPLICATED_USERNAME :
@@ -84,7 +83,7 @@ UserSchema.post('save', function(error, doc, next) {
 });
 
 UserSchema.options.toJSON = {
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret.password;
   }
 };
@@ -147,7 +146,7 @@ UserSchema.statics = {
       .skip(+skip)
       .limit(+limit)
       .exec();
-    },
+  },
 
   /**
    * Search for users
