@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   },
   favTeams: [{
-    type: mongoose.Schema.Types.ObjectId, ref: 'Team'
+    type: mongoose.Schema.Types.ObjectId
   }],
   reputation: {
     type: Number,

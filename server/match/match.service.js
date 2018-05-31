@@ -2,7 +2,6 @@ const cache = require('memory-cache');
 const wltdoFacade = require('../helpers/whoLetTheDogsOut.facade');
 
 const EIGHT_HOURS_IN_MS = 1000 * 60 * 60 * 8;
-const ONE_DAY_IN_MS = EIGHT_HOURS_IN_MS * 3;
 
 const matchesCache = new cache.Cache();
 
@@ -44,7 +43,7 @@ const getMatchesByTimeInterval = (startDate, endDate) => {
         resolve(matches);
     } else {
       wltdoFacade.getMatchesOnInterval(startDate, endDate).then(matches => {
-        matchesCache.put(key, matches, ONE_DAY_IN_MS);
+        matchesCache.put(key, matches, EIGHT_HOURS_IN_MS);
         resolve(matches);
       }).catch(reject);
     }

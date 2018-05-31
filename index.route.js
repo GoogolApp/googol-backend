@@ -22,7 +22,7 @@ router.use('/users', userRoutes);
 router.use('/auth', authRoutes);
 
 // mount auth routes at /team
-router.use('/team', teamRoutes);
+router.use('/teams', teamRoutes);
 
 // mount auth routes at /auth
 router.use('/bar', barRoutes);
