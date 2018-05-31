@@ -41,14 +41,13 @@ const getAllTeams = () => {
     } else {
       wltdoFacade.getAllTeams().then(teams => {
         teams.forEach((team) => {
-          cache.put(team._id, team, EIGHT_HOURS_IN_MS);
+          teamsCache.put(team._id, team, EIGHT_HOURS_IN_MS);
         });
-        cache.put(ALL_TEAMS_KEY, teams, EIGHT_HOURS_IN_MS);
+        teamsCache.put(ALL_TEAMS_KEY, teams, EIGHT_HOURS_IN_MS);
         resolve(teams);
       }).catch(reject);
     }
   });
 };
-
 
 module.exports = {getTeamById, getAllTeams};
