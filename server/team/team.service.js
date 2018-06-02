@@ -50,4 +50,24 @@ const getAllTeams = () => {
   });
 };
 
-module.exports = {getTeamById, getAllTeams};
+/**
+ * Recive an array of Teams id and populate it.
+ *
+ * @param teamIdArray
+ *
+ * @returns {Promise<[Team]>}
+ */
+const populateTeams = teamIdArray => {
+  const teams = [];
+  const promises = [];
+  teamIdArray.forEach(teamId => {
+    const promise = getTeamById(teamId).then(team => teams.push(team));
+    promises.push(promise);
+  });
+
+  return Promise.all(promises).then(() => {
+    return teams;
+  });
+};
+
+module.exports = {getTeamById, getAllTeams, populateTeams};

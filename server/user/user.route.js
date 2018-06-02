@@ -20,7 +20,7 @@ router.route('/')
 
 router.route('/search')
   /** GET /api/users/search - Get list of users */
-  .get(userCtrl.search) 
+  .get(userCtrl.search)
 
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */

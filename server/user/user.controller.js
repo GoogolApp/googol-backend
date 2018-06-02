@@ -1,5 +1,5 @@
 const User = require('./user.model');
-const Team = require('../team/team.model');
+const teamService = require('../team/team.service');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
@@ -98,20 +98,19 @@ function remove(req, res, next) {
 
 /**
  * Update existing user fav team list
- * @property {string} req.body.favTeams - The username of user.
+ *
+ * @property {string} req.body.favTeams - Arrays of id`s of Teams
+ *
  * @returns {User}
  */
 function updateFavTeams(req, res, next) {
   const user = req.queryUser;
-  Team.find({ _id: { $in: req.body.favTeams } }).distinct('_id')
-    .then((favTeamArr) => {
-      user.favTeams = favTeamArr;
-      return user;
-    }).then(() => {
-      user.save()
-        .then(savedUser => res.json(savedUser))
-        .catch(e => next(e));
-    })
+  const teamsFromRequest = req.body.favTeams;
+
+  user.favTeams = teamsFromRequest;
+
+  user.save()
+    .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
 }
 
