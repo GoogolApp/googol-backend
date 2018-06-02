@@ -1,5 +1,4 @@
 const User = require('./user.model');
-const teamService = require('../team/team.service');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
+const TeamService = require('../team/team.service');
 
 const Fawn = require("fawn");
 Fawn.init(mongoose);
@@ -112,11 +113,14 @@ UserSchema.statics = {
         path: 'history', // To load history on main user page
         options: { limit: 5 }
       })
-      .populate('favTeams') // select: 'imgSource', after implement team model
       .exec()
       .then((user) => {
         if (user) {
-          return user;
+          return TeamService.populateTeams(user.favTeams).then((teams) => {
+            const userObj = user.toObject();
+            userObj.favTeams = teams;
+            return userObj
+          });
         }
         const err = new APIError(ErrorMessages.USER_NOT_FOUND, httpStatus.NOT_FOUND);
         return Promise.reject(err);
