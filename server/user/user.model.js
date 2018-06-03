@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
-const TeamService = require('../team/team.service');
 
 const Fawn = require("fawn");
 Fawn.init(mongoose);

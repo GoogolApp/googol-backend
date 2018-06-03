@@ -55,7 +55,6 @@ module.exports = {
     const favTeams = req.body.favTeams;
 
     const favTeamsWithoutDuplicates = [];
-
     const validMap = {};
 
     favTeams.forEach((teamId) => {
