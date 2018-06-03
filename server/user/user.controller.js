@@ -2,6 +2,7 @@ const User = require('./user.model');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
+const TeamService = require('../team/team.service');
 
 const ADD = "add";
 const REMOVE = "remove";
@@ -19,11 +20,16 @@ function load(req, res, next, id) {
 }
 
 /**
- * Get user
- * @returns {User}
+ * Get user and populate his favTeams.
  */
 function get(req, res) {
-  return res.json(req.queryUser);
+  const user = req.queryUser;
+  return TeamService.populateTeams(user.favTeams)
+    .then((teams) => {
+      const userObj = user.toObject();
+      userObj.favTeams = teams;
+      res.json(userObj);
+    });
 }
 
 /**
@@ -107,6 +113,8 @@ function updateFavTeams(req, res, next) {
   const teamsFromRequest = req.body.favTeams;
 
   user.favTeams = teamsFromRequest;
+
+  console.log(user);
 
   user.save()
     .then(savedUser => res.json(savedUser))

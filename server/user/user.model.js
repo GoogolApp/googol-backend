@@ -116,11 +116,7 @@ UserSchema.statics = {
       .exec()
       .then((user) => {
         if (user) {
-          return TeamService.populateTeams(user.favTeams).then((teams) => {
-            const userObj = user.toObject();
-            userObj.favTeams = teams;
-            return userObj
-          });
+          return user;
         }
         const err = new APIError(ErrorMessages.USER_NOT_FOUND, httpStatus.NOT_FOUND);
         return Promise.reject(err);
