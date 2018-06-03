@@ -23,7 +23,6 @@ function get(req, res) {
 
 /**
  * Search bars
- * TODO: make a way to search without point
  * @property {string} req.query.keyword - Keyword to be searched for in name of bars.
  * @property {number} req.query.latitude - Latitude of the point of the center of the search 
  * @property {number} req.query.longitude -  Longitude of the point of the center of the search 

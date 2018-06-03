@@ -46,7 +46,7 @@ function create(req, res, next) {
 }
 
 /**
- * A owner can claim a bar
+ * An owner can claim a bar
  * @property {string} req.body.placeID - The placeId of the bar.
  * @returns {Owner}
  */
