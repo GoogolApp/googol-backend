@@ -1,6 +1,8 @@
 const Owner = require('./owner.model');
 const Bar = require('../bar/bar.model');
 
+const barCtrl = require('../bar/bar.controller');
+
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 const httpStatus = require('http-status');
@@ -44,10 +46,7 @@ function create(req, res, next) {
 }
 
 /**
- * TODO: Static method? N consegui
- * TODO: Permite mudar de bar? Permite.. 
- * TODO: Se bar already taken? Menságem de erro
- * A owner can claim a bar
+ * An owner can claim a bar
  * @property {string} req.body.placeID - The placeId of the bar.
  * @returns {Owner}
  */
@@ -60,14 +59,35 @@ function setMyBar(req, res, next) {
       if(bar){
         owner.bar = bar;
         return owner;
+      }else{
+        return barCtrl.saveBar(req.body.name, req.body.placeId, req.body.longitude, req.body.latitude)
+        .then((savedBar) => {
+          owner.bar = savedBar;
+          return owner;
+        })
+        .catch(e => {
+          const err = new APIError(ErrorMessages.ERROR_CREATE_BAR, httpStatus.BAD_REQUEST);
+          return Promise.reject(err);
+        })
       }
-      const err = new APIError(ErrorMessages.BAR_NOT_FOUND, httpStatus.NOT_FOUND);
-      return Promise.reject(err);
     }).then(() => {
       owner.save()
         .then(savedOwner => res.json(savedOwner))
         .catch(e => next(e));
     })
+    .catch(e => next(e));
+}
+
+/**
+ * Get owner list.
+ * @property {number} req.query.skip - Number of owners to be skipped.
+ * @property {number} req.query.limit - Limit number of owners to be returned.
+ * @returns {Owner[]}
+ */
+function list(req, res, next) {
+  const { limit = 50, skip = 0 } = req.query;
+  Owner.list({ limit, skip })
+    .then(owners => res.json(owners))
     .catch(e => next(e));
 }
 
@@ -82,4 +102,4 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, setMyBar, remove };
+module.exports = { load, get, create, setMyBar, remove, list};

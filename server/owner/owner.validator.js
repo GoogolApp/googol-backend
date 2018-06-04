@@ -12,7 +12,10 @@ module.exports = {
   // POST /:ownerId/myBar
   setMyBar: {
     body: {
-      placeId: Joi.required()
+      name: Joi.string(),
+      placeId: Joi.string().required(),
+      latitude: Joi.number(),
+      longitude: Joi.number()
     },
     params: {
       ownerId: Joi.string().hex().required()

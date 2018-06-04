@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
   }],
   reputation: {
     type: Number,
-    Default: 0
+    default: 0
   },
   following: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
