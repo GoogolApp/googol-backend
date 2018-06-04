@@ -1,8 +1,8 @@
 const User = require('./user.model');
-const Team = require('../team/team.model');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
+const TeamService = require('../team/team.service');
 
 const ADD = "add";
 const REMOVE = "remove";
@@ -20,11 +20,16 @@ function load(req, res, next, id) {
 }
 
 /**
- * Get user
- * @returns {User}
+ * Get user and populate his favTeams.
  */
 function get(req, res) {
-  return res.json(req.queryUser);
+  const user = req.queryUser;
+  return TeamService.populateTeams(user.favTeams)
+    .then((teams) => {
+      const userObj = user.toObject();
+      userObj.favTeams = teams;
+      res.json(userObj);
+    });
 }
 
 /**
@@ -98,20 +103,21 @@ function remove(req, res, next) {
 
 /**
  * Update existing user fav team list
- * @property {string} req.body.favTeams - The username of user.
+ *
+ * @property {string} req.body.favTeams - Arrays of id`s of Teams
+ *
  * @returns {User}
  */
 function updateFavTeams(req, res, next) {
   const user = req.queryUser;
-  Team.find({ _id: { $in: req.body.favTeams } }).distinct('_id')
-    .then((favTeamArr) => {
-      user.favTeams = favTeamArr;
-      return user;
-    }).then(() => {
-      user.save()
-        .then(savedUser => res.json(savedUser))
-        .catch(e => next(e));
-    })
+  const teamsFromRequest = req.body.favTeams;
+
+  user.favTeams = teamsFromRequest;
+
+  console.log(user);
+
+  user.save()
+    .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
 }
 

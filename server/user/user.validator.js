@@ -1,4 +1,9 @@
 const Joi = require('joi');
+const ObjectId = require('mongoose').Types.ObjectId;
+const APIError = require('../helpers/APIError');
+const ErrorMessages = require('../helpers/ErrorMessages');
+const httpStatus = require('http-status');
+
 
 const ADD = "add";
 const REMOVE = "remove";
@@ -44,6 +49,27 @@ module.exports = {
     params: {
       userId: Joi.string().hex().required()
     }
+  },
+
+  validateFavTeams: (req, res, next) => {
+    const favTeams = req.body.favTeams;
+
+    const favTeamsWithoutDuplicates = [];
+    const validMap = {};
+
+    favTeams.forEach((teamId) => {
+      validMap[teamId] = ObjectId.isValid(teamId);
+    });
+
+    for (const key in validMap) {
+      if (!validMap[key]) {
+        return next(new APIError(ErrorMessages.INVALID_TEAM_ID + `: [${key}]`, httpStatus.BAD_REQUEST, true));
+      }
+      favTeamsWithoutDuplicates.push(key);
+    }
+
+    req.body.favTeams = favTeamsWithoutDuplicates;
+    next();
   }
 
 };

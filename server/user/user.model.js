@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   },
   favTeams: [{
-    type: mongoose.Schema.Types.ObjectId, ref: 'Team'
+    type: mongoose.Schema.Types.ObjectId
   }],
   reputation: {
     type: Number,
@@ -112,7 +112,6 @@ UserSchema.statics = {
         path: 'history', // To load history on main user page
         options: { limit: 5 }
       })
-      .populate('favTeams') // select: 'imgSource', after implement team model
       .exec()
       .then((user) => {
         if (user) {

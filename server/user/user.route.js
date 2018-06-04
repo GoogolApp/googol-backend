@@ -20,7 +20,7 @@ router.route('/')
 
 router.route('/search')
   /** GET /api/users/search - Get list of users */
-  .get(userCtrl.search) 
+  .get(userCtrl.search)
 
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */
@@ -34,7 +34,7 @@ router.route('/:userId')
 
 router.route('/:userId/favTeam')
   /** PUT /api/users/:userId - Update user */
-  .put([validate(paramValidation.updateFavTeams), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
+  .put([validate(paramValidation.updateFavTeams), paramValidation.validateFavTeams, expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
 
 router.route('/:userId/following')
   .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing)

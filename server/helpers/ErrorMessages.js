@@ -9,6 +9,9 @@ module.exports = {
   //match
   ERROR_RETRIEVING_MATCHES: 'Algo inesperado ocorreu ao recuperar as partidas.',
 
+  //team
+  INVALID_TEAM_ID: 'O valor passado não corresponde ao id de um time válido',
+
   //auth
   INVALID_EMAIL_OR_PASSWORD: 'Email ou senha incorretos.',
   FORBIDDEN_DEFAULT: 'Desculpe, você não pode fazer isso.',

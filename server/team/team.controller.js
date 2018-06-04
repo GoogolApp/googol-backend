@@ -1,18 +1,12 @@
-const Team = require('./team.model');
-
+const teamService = require('./team.service');
 
 /**
- * Get user list.
- * @property {number} req.query.skip - Number of users to be skipped.
- * @property {number} req.query.limit - Limit number of users to be returned.
- * @returns {Team[]}
+ * Get all Teams.
  */
-function list(req, res, next) {
-  const { limit = 50, skip = 0 } = req.query;
-  Team.list({ limit, skip })
+const list = (req, res, next) => {
+  teamService.getAllTeams()
     .then(teams => res.json(teams))
-    .catch(e => next(e));
-}
-
+    .catch(err => next(err));
+};
 
 module.exports = { list };
