@@ -48,8 +48,10 @@ const UserSchema = new mongoose.Schema({
   }],
   eventHistory: [{
     type: mongoose.Schema.Types.ObjectId // ref:'Event'
+  }],
+  followingBars: [{
+    type: mongoose.Schema.Types.ObjectId, ref: 'Bar'
   }]
-
 });
 
 /**
