@@ -38,6 +38,14 @@ router.route('/:userId/favTeam')
 
 router.route('/:userId/following')
   .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing)
+  
+  /** GET /api/users/:userId/following - Get user following users */  
+  .get(userCtrl.getFollowing)
+  
+router.route('/:userId/followers')
+  /** GET /api/users/:userId/following - Get user followers */  
+  .get(userCtrl.getFollowers)
+
 
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.load);

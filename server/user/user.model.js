@@ -179,7 +179,28 @@ UserSchema.statics = {
     return user.update({$pull: {following: userToBeFollowedId}}, {safe: true, new: true}).then(() => {
       return this.update({_id: userToBeFollowedId}, {$pull: {followers: user._id}}, {safe: true, new: true});
     });
+  },
+
+  followingUsers (id) {
+    return this.findById(id)
+    .populate({
+      path: 'following',
+      select: '_id username reputation'
+    })
+    .select({_id:1, username : 1, following:1})
+    .exec()
+  },
+
+  followersUsers (id) {
+    return this.findById(id)
+    .populate({
+      path: 'followers',
+      select: '_id username reputation'
+    })
+    .select({_id:1, username : 1, followers:1})
+    .exec()
   }
+
 };
 
 /**
