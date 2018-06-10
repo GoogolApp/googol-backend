@@ -51,7 +51,15 @@ BarSchema.index({ "location": "2dsphere" });
 /**
  * Methods
  */
+BarSchema.method({
+  addFollower (followerId) {
+    return this.update({$addToSet: {followers: {_id: followerId}}});
+  },
 
+  removeFollower (followerId) {
+    return this.update({$pull: {followers: followerId}}, {safe: true, new: true});
+  }
+});
 
 /**
  * Statics
@@ -93,7 +101,7 @@ BarSchema.statics = {
    * Search for bars
    * @param {ObjectId} keyword - The name to search for.
    * @returns {Promise<Bar, APIError>}
-   * 
+   *
    */
   search(keyword, latitude = 0, longitude = 0, maximumDistance = 50000, { skip = 0, limit = 50 } = {}) {
     return this.find({name: { '$regex' : keyword, '$options' : 'i' }})

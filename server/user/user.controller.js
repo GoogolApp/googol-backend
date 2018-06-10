@@ -1,4 +1,5 @@
 const User = require('./user.model');
+const Bar = require('../bar/bar.model');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
@@ -134,11 +135,11 @@ function updateFollowing (req, res, next) {
   const operation = req.body.operation;
 
   if (operation === ADD) {
-    _follow(user, userToBeFollowedOrUnfollowedId)
+    _followUser(user, userToBeFollowedOrUnfollowedId)
       .then(user => res.json(user))
       .catch(err => next(new APIError(ErrorMessages.ERROR_ON_FOLLOW_USER, httpStatus.BAD_REQUEST, true)));
   } else {
-    _unfollow(user, userToBeFollowedOrUnfollowedId)
+    _unfollowUser(user, userToBeFollowedOrUnfollowedId)
       .then(user => res.json(user))
       .catch(err => next(new APIError(ErrorMessages.ERROR_ON_UNFOLLOW_USER, httpStatus.BAD_REQUEST, true)));  }
 }
@@ -150,7 +151,7 @@ function updateFollowing (req, res, next) {
  * @param userToBeFollowedId - Id of the User that will be followed.
  * @private
  */
-function _follow (user, userToBeFollowedId) {
+function _followUser (user, userToBeFollowedId) {
   return User.followUser(user, userToBeFollowedId).then(() => {
     return User.get(user._id);
   });
@@ -163,10 +164,48 @@ function _follow (user, userToBeFollowedId) {
  * @param userToBeUnfollowedId - Id of the User that will be unfollowed.
  * @private
  */
-function _unfollow (user, userToBeUnfollowedId) {
+function _unfollowUser (user, userToBeUnfollowedId) {
   return User.unfollowUser(user, userToBeUnfollowedId).then(() => {
     return User.get(user._id);
   });
 }
 
-module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing};
+function updateFollowingBars (req, res, next) {
+  const user = req.queryUser;
+  const barId = req.body.barId;
+  const operation = req.body.operation;
+  console.log("=====================================================================");
+  console.log(barId);
+  console.log("=====================================================================");
+  if (operation === ADD) {
+    _followBar(user, barId)
+      .then(user => res.json(user))
+      .catch(err => next(err))
+  } else {
+    _unfollowBar(user, barId)
+      .then(user => res.json(user))
+      .catch(err => next(err))
+  }
+}
+
+async function _followBar (userDoc, barId) {
+  try {
+    const bar = await Bar.get(barId);
+    await bar.addFollower(userDoc._id);
+    return userDoc.followBar(barId);
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function _unfollowBar (userDoc, barId) {
+  try {
+    const bar = await Bar.get(barId);
+    await bar.removeFollower(userDoc._id);
+    return userDoc.unfollowBar(barId);
+  } catch (err) {
+    throw err;
+  }
+}
+
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars};
