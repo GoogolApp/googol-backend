@@ -66,13 +66,17 @@ function create(req, res, next) {
 /**
  * Update existing user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.name - The name of user.
+ * @property {string} req.body.password - The name of user.
  * @returns {User}
  */
 function update(req, res, next) {
   const user = req.queryUser;
-  user.username = req.body.username;
-  user.name = req.body.name;
+  if(req.body.username){
+    user.username = req.body.username;
+  }
+  if(req.body.password){
+    user.password = req.body.password;
+  }
   user.save()
     .then(savedUser => res.json(savedUser))
     .catch(e => next(e));
@@ -171,6 +175,29 @@ function _unfollowUser (user, userToBeUnfollowedId) {
 }
 
 /**
+ * Get user following users.
+ * @returns {User[]}
+ */
+function getFollowing(req, res, next) {
+  const user = req.queryUser;
+  User.followingUsers(user._id)
+    .then(user => res.json(user))
+    .catch(e => next(e));
+
+}
+
+/**
+ * Get user followers.
+ * @returns {User[]}
+ */
+function getFollowers(req, res, next) {
+  const user = req.queryUser;
+  User.followersUsers(user._id)
+    .then(user => res.json(user))
+    .catch(e => next(e));
+}
+
+/**
  * Update the followingBars of the User. This can be an add or remove operation.
  *
  * @property {string} req.body.operation - The operation that can be add or remove .
@@ -227,4 +254,4 @@ async function _unfollowBar (userDoc, barId) {
   }
 }
 
-module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars};
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars, getFollowing, getFollowers};

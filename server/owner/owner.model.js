@@ -29,7 +29,8 @@ const OwnerSchema = new mongoose.Schema({
   },
   bar: {
     type: mongoose.Schema.Types.ObjectId, ref: 'Bar',
-    unique: true
+    unique: true,
+    sparse: true
   }
 });
 

@@ -37,7 +37,14 @@ router.route('/:userId/favTeam')
   .put([validate(paramValidation.updateFavTeams), paramValidation.validateFavTeams, expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
 
 router.route('/:userId/following')
-  .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing);
+  .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing)
+
+  /** GET /api/users/:userId/following - Get user following users */
+  .get(userCtrl.getFollowing)
+
+router.route('/:userId/followers')
+  /** GET /api/users/:userId/following - Get user followers */
+  .get(userCtrl.getFollowers)
 
 router.route('/:userId/followingBars')
   .patch([validate(paramValidation.updateFollowingBar), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowingBars);
