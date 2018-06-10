@@ -170,18 +170,21 @@ function _unfollowUser (user, userToBeUnfollowedId) {
   });
 }
 
-function updateFollowingBars (req, res, next) {
+async function updateFollowingBars (req, res, next) {
   const user = req.queryUser;
   const barId = req.body.barId;
   const operation = req.body.operation;
-  if (operation === ADD) {
-    _followBar(user, barId)
-      .then(user => res.json(user))
-      .catch(err => next(err))
-  } else {
-    _unfollowBar(user, barId)
-      .then(user => res.json(user))
-      .catch(err => next(err))
+
+  const promise = operation === ADD ?
+    _followBar(user, barId) :
+    _unfollowBar(user, barId);
+
+  try {
+    await promise;
+    const updatedUser = await User.get(user._id);
+    res.json(updatedUser);
+  } catch (err) {
+    next(err);
   }
 }
 
