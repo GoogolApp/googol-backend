@@ -14,6 +14,10 @@ router.route('/')
   /** POST /api/bar - Create new bar */
   .post(validate(paramValidation.createBar), barCtrl.create);
 
+router.route('/geosearch')
+  /** GET /api/geoSearch - Get list of bars with localization */
+  .get(barCtrl.geoSearch)
+
 router.route('/search')
   /** GET /api/search - Get list of bars */
   .get(barCtrl.search)

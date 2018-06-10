@@ -29,8 +29,21 @@ function get(req, res) {
  * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers 
  * @returns [{Bar}]
  */
+function geoSearch(req, res, next) {
+  Bar.geolocationSearch(req.query.keyword, req.query.latitude, req.query.longitude, req.query.maxDistance)
+    .then((bars) => {
+      return res.json(bars);
+    })
+    .catch(e => next(e));
+}
+
+/**
+ * Search bars
+ * @property {string} req.query.keyword - Keyword to be searched for in name of bars.
+ * @returns [{Bar}]
+ */
 function search(req, res, next) {
-  Bar.search(req.query.keyword, req.query.latitude, req.query.longitude, req.query.maxDistance)
+  Bar.search(req.query.keyword)
     .then((bars) => {
       return res.json(bars);
     })
@@ -99,4 +112,4 @@ function remove(req, res, next) {
 }
 
 
-module.exports = { load, get, create, list, remove, search, saveBar};
+module.exports = { load, get, create, list, remove, geoSearch, search, saveBar};
