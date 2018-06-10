@@ -7,7 +7,7 @@ module.exports = {
       email: Joi.string().email().required(),
       password: Joi.string().required()
     }
-  }, 
+  },
 
   // POST /:ownerId/myBar
   setMyBar: {
@@ -21,4 +21,4 @@ module.exports = {
       ownerId: Joi.string().hex().required()
     }
   }
-}
+};

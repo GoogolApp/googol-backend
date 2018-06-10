@@ -51,7 +51,15 @@ BarSchema.index({ "location": "2dsphere" });
 /**
  * Methods
  */
+BarSchema.method({
+  addFollower (followerId) {
+    return this.update({$addToSet: {followers: {_id: followerId}}});
+  },
 
+  removeFollower (followerId) {
+    return this.update({$pull: {followers: followerId}}, {safe: true, new: true});
+  }
+});
 
 /**
  * Statics
@@ -96,7 +104,7 @@ BarSchema.statics = {
    * @param {ObjectId} longitude - Latitude of the point of the center of the search 
    * @param {ObjectId} maximumDistance - range of search- Optional
    * @returns {Promise<Bar, APIError>}
-   * 
+   *
    */
   geolocationSearch(keyword, latitude = 0, longitude = 0, maximumDistance = 50000, { skip = 0, limit = 50 } = {}) {
     return this.find({name: { '$regex' : keyword, '$options' : 'i' }})
