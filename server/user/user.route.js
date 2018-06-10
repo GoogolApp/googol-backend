@@ -40,7 +40,7 @@ router.route('/:userId/following')
   .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing);
 
 router.route('/:userId/followingBars')
-  .patch([expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowingBars);
+  .patch([validate(paramValidation.updateFollowingBar), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowingBars);
 
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.load);

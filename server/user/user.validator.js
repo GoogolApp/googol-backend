@@ -8,6 +8,8 @@ const httpStatus = require('http-status');
 const ADD = "add";
 const REMOVE = "remove";
 
+const objectIdJoiValidatior = Joi.string().regex(/^[0-9a-fA-F]{24}$/, "mongoDB object id").required();
+
 module.exports = {
   // POST /api/users
   createUser: {
@@ -48,6 +50,17 @@ module.exports = {
     },
     params: {
       userId: Joi.string().hex().required()
+    }
+  },
+
+  // PATCH /api/users/:userId/followingBar
+  updateFollowingBar: {
+    body: {
+      operation: Joi.string().valid(ADD, REMOVE).required(),
+      barId: objectIdJoiValidatior
+    },
+    params: {
+      userId: objectIdJoiValidatior
     }
   },
 
