@@ -170,6 +170,13 @@ function _unfollowUser (user, userToBeUnfollowedId) {
   });
 }
 
+/**
+ * Update the followingBars of the User. This can be an add or remove operation.
+ *
+ * @property {string} req.body.operation - The operation that can be add or remove .
+ * @property {string} req.body.barId - The id of the Bar to be followed.
+ * @property {string} req.body.queryUser - The User document that will follow the Bar.
+ */
 async function updateFollowingBars (req, res, next) {
   const user = req.queryUser;
   const barId = req.body.barId;
@@ -188,6 +195,12 @@ async function updateFollowingBars (req, res, next) {
   }
 }
 
+/**
+ * Add a bar to the following User list and adds the user to the bar followers list.
+ *
+ * @returns {Promise.<*>}
+ * @private
+ */
 async function _followBar (userDoc, barId) {
   try {
     const bar = await Bar.get(barId);
@@ -198,6 +211,12 @@ async function _followBar (userDoc, barId) {
   }
 }
 
+/**
+ * Remove the bar from the following User list and removes the user from the bar followers list.
+ *
+ * @returns {Promise}
+ * @private
+ */
 async function _unfollowBar (userDoc, barId) {
   try {
     const bar = await Bar.get(barId);
