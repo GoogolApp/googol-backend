@@ -5,6 +5,8 @@ module.exports = {
   USER_NOT_FOUND: 'Usuário não encontrado.',
   ERROR_ON_FOLLOW_USER: 'Não foi possível seguir o usuário.',
   ERROR_ON_UNFOLLOW_USER: 'Não foi possível deixar de seguir o usuário.',
+  ERROR_ON_FOLLOW_TEAM: 'Não foi possível seguir o time.',
+  ERROR_ON_UNFOLLOW_TEAM: 'Não foi possível deixar de seguir o time.',
 
   //match
   ERROR_RETRIEVING_MATCHES: 'Algo inesperado ocorreu ao recuperar as partidas.',

@@ -106,24 +106,27 @@ function remove(req, res, next) {
 }
 
 /**
- * Update existing user fav team list
- *
- * @property {string} req.body.favTeams - Arrays of id`s of Teams
- *
- * @returns {User}
+ * Update the favorite Teams of a User. This can be an add or remove operation.
+ * @property {string} req.body.operation - The operation that can be add or remove .
+ * @property {string} req.body.teamId - The id of the User to be followed.
+ * @property {string} req.body.queryUser - The User document that will follow.
  */
 function updateFavTeams(req, res, next) {
   const user = req.queryUser;
-  const teamsFromRequest = req.body.favTeams;
+  const teamId = req.body.favTeamId;
+  const operation = req.body.operation;
 
-  user.favTeams = teamsFromRequest;
-
-  console.log(user);
-
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+  if (operation === ADD) {
+    User.addFavTeam(user._id, teamId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_FOLLOW_TEAM, httpStatus.BAD_REQUEST, true)));
+  } else {
+    User.removeFavTeam(user._id, teamId)
+      .then(user => res.json(user))
+      .catch(err => next(new APIError(ErrorMessages.ERROR_ON_UNFOLLOW_TEAM, httpStatus.BAD_REQUEST, true)));
+  }
 }
+
 
 /**
  * Update the following of the User. This can be an add or remove operation.
@@ -195,4 +198,4 @@ function getFollowers(req, res, next) {
     .then(user => res.json(user))
     .catch(e => next(e));
 }
-module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, getFollowing, getFollowers};
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, getFollowing, getFollowers, updateFavTeams};
