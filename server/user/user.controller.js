@@ -174,9 +174,6 @@ function updateFollowingBars (req, res, next) {
   const user = req.queryUser;
   const barId = req.body.barId;
   const operation = req.body.operation;
-  console.log("=====================================================================");
-  console.log(barId);
-  console.log("=====================================================================");
   if (operation === ADD) {
     _followBar(user, barId)
       .then(user => res.json(user))
