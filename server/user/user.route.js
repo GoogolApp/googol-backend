@@ -33,8 +33,8 @@ router.route('/:userId')
   .delete([expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.remove);
 
 router.route('/:userId/favTeam')
-  /** PUT /api/users/:userId - Update user */
-  .put([validate(paramValidation.updateFavTeams), paramValidation.validateFavTeams, expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams);
+  /** PATCH /api/users/:userId/favTeam - Add or Remove a favTeam */
+  .patch([validate(paramValidation.patchFavTeams), paramValidation.validateFavTeam, expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFavTeams)
 
 router.route('/:userId/following')
   .patch([validate(paramValidation.updateFollowing), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowing)

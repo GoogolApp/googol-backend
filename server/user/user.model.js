@@ -209,7 +209,19 @@ UserSchema.statics = {
     })
     .select({_id:1, username : 1, followers:1})
     .exec()
+  },
+
+  addFavTeam(user, teamId) {
+    return this.findByIdAndUpdate(user,
+      { $addToSet: { favTeams: teamId } }, { safe: true, new: true })
+    .exec();
+  },
+
+  removeFavTeam(user, teamId) {
+    return this.findByIdAndUpdate(user, { $pull: { favTeams: teamId } }, { safe: true, new: true })
+    .exec();
   }
+  
 
 };
 

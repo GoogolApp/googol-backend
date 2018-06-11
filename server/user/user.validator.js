@@ -51,6 +51,17 @@ module.exports = {
     }
   },
 
+  // PATCH /api/users/:userId/favTeam
+  patchFavTeams: {
+    body: {
+      operation: Joi.string().valid(ADD, REMOVE).required(),
+      favTeamId: Joi.string().required()
+    },
+    params: {
+      userId: Joi.string().hex().required()
+    }
+  },
+
   // PATCH /api/users/:userId/followingBar
   updateFollowingBar: {
     body: {
@@ -62,25 +73,13 @@ module.exports = {
     }
   },
 
-  validateFavTeams: (req, res, next) => {
-    const favTeams = req.body.favTeams;
-
-    const favTeamsWithoutDuplicates = [];
-    const validMap = {};
-
-    favTeams.forEach((teamId) => {
-      validMap[teamId] = ObjectId.isValid(teamId);
-    });
-
-    for (const key in validMap) {
-      if (!validMap[key]) {
-        return next(new APIError(ErrorMessages.INVALID_TEAM_ID + `: [${key}]`, httpStatus.BAD_REQUEST, true));
-      }
-      favTeamsWithoutDuplicates.push(key);
+  validateFavTeam: (req, res, next) => {
+    const favTeams = req.body.favTeamId;
+    if (!ObjectId.isValid(favTeams)) {
+      return next(new APIError(ErrorMessages.INVALID_TEAM_ID, httpStatus.BAD_REQUEST, true));
+    } else {
+      next();
     }
-
-    req.body.favTeams = favTeamsWithoutDuplicates;
-    next();
   }
 
 };
