@@ -48,8 +48,10 @@ const UserSchema = new mongoose.Schema({
   }],
   eventHistory: [{
     type: mongoose.Schema.Types.ObjectId // ref:'Event'
+  }],
+  followingBars: [{
+    type: mongoose.Schema.Types.ObjectId, ref: 'Bar'
   }]
-
 });
 
 /**
@@ -94,6 +96,14 @@ UserSchema.options.toJSON = {
 UserSchema.method({
   comparePassword (reqPassword, userPassword) {
     return bcrypt.compareSync(reqPassword, userPassword)
+  },
+
+  followBar (barId) {
+    return this.update({$addToSet: {followingBars: {_id: barId}}});
+  },
+
+  unfollowBar (barId) {
+    return this.update({$pull: {followingBars: barId}}, {safe: true, new: true});
   }
 });
 
