@@ -24,5 +24,9 @@ module.exports = {
   //bar
   BAR_NOT_FOUND: 'Bar não encontrado.',
   BAR_TAKEN: 'Bar já foi reivindicado por outro usuário',
-  ERROR_CREATE_BAR: 'Erro ao cadastrar o bar no sistema'
+  ERROR_CREATE_BAR: 'Erro ao cadastrar o bar no sistema',
+
+  //event
+  ERROR_CREATE_EVENT: 'Evento já existente.'
+
 };
