@@ -111,7 +111,7 @@ BarSchema.statics = {
       .where('location').near({ center: { coordinates: [longitude, latitude], type: 'Point' }, maxDistance: maximumDistance*1000})
       .skip(+skip)
       .limit(+limit)
-      .select({ name: 1, _id: 1, placeId: 1})
+      .select({ name: 1, _id: 1, placeId: 1, location: 1})
       .exec();
   },
 

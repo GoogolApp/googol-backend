@@ -5,6 +5,9 @@ const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 
 
+const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
+
+
 /**
  * Event Schema
  */
@@ -41,7 +44,7 @@ EventSchema.index({ match: 1, bar: 1 }, { unique: true });
  * - virtuals
  */
 
-OwnerSchema.post('save', function (error, doc, next) {
+EventSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) { 
     const message = ErrorMessages.ERROR_CREATE_EVENT;
     next(new APIError(message, httpStatus.BAD_REQUEST, true));
@@ -57,27 +60,56 @@ OwnerSchema.post('save', function (error, doc, next) {
 /**
  * Statics
  */
-var populateQuery = [{path:'match'}, {path:'bar', select:'_id name'}];
+
 EventSchema.statics = {
  /**
-   * Get 'bar'
-   * @param {ObjectId} id - The objectId of bar.
-   * @returns {Promise<Bar, APIError>}
+   * Get 'event'
+   * @param {ObjectId} id - The objectId of event.
+   * @returns {Promise<Event, APIError>}
    */
   
   get(id) {
     return this.findById(id)
-      .populate(populateQuery)
-      .execPopulate()
+      .populate([{path:'bar', select:'_id name'}, {path:'attendants', select:'username email'}])
       .exec()
-      .then((bar) => {
-        if (bar) {
-          return bar;
+      .then((event) => {
+        if (event) {
+          return event;
         }
-        const err = new APIError(ErrorMessages.BAR_NOT_FOUND, httpStatus.NOT_FOUND);
+        const err = new APIError(ErrorMessages.EVENT_NOT_FOUND, httpStatus.NOT_FOUND);
         return Promise.reject(err);
       });
   },
+
+  /**
+   * List events in descending order of 'createdAt' timestamp.
+   * @param {number} skip - Number of events to be skipped.
+   * @param {number} limit - Limit number of events to be returned.
+   * @returns {Promise<Events[]>}
+   */
+  list({ skip = 0, limit = 50 } = {}) {
+    return this.find()
+      .populate([{path:'bar', select:'_id name'}, {path:'attendants', select:'username email'}])
+      .sort({ createdAt: -1 })
+      .skip(+skip)
+      .limit(+limit)
+      .exec();
+  },
+
+    /**
+   * List events in descending order of 'createdAt' timestamp.
+   * @param {number} skip - Number of events to be skipped.
+   * @param {number} limit - Limit number of events to be returned.
+   * @returns {Promise<Events[]>}
+   * name distance/*/
+  listGeolocation(barList, { skip = 0, limit = 50 } = {}) {
+    return this.find({'bar': {$in: barList}})
+      .populate([{path:'bar', select:'_id location'}, {path:'attendants', select:'username email'}])
+      .skip(+skip)
+      .sort({distance: 1})
+      .limit(+limit)
+      .exec();
+  }
 };
 
 /**

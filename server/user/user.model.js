@@ -104,6 +104,10 @@ UserSchema.method({
 
   unfollowBar (barId) {
     return this.update({$pull: {followingBars: barId}}, {safe: true, new: true});
+  },
+
+  reputationAddition (value) {
+    return this.update({$inc: {reputation: value}});
   }
 });
 

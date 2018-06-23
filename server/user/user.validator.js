@@ -24,7 +24,8 @@ module.exports = {
   updateUser: {
     body: Joi.object().keys({
       username: Joi.string(),
-      password: Joi.string()}).or('username', 'password'),
+      password: Joi.string()})
+    .or('username', 'password'),
     params: {
       userId: Joi.string().hex().required()
     }
