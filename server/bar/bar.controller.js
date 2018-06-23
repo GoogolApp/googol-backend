@@ -24,9 +24,9 @@ function get(req, res) {
 /**
  * Search bars
  * @property {string} req.query.keyword - Keyword to be searched for in name of bars.
- * @property {number} req.query.latitude - Latitude of the point of the center of the search 
- * @property {number} req.query.longitude -  Longitude of the point of the center of the search 
- * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers 
+ * @property {number} req.query.latitude - Latitude of the point of the center of the search
+ * @property {number} req.query.longitude -  Longitude of the point of the center of the search
+ * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers
  * @returns [{Bar}]
  */
 function geoSearch(req, res, next) {
@@ -54,13 +54,13 @@ function search(req, res, next) {
  * Create new bar
  * @property {string} req.body.name - The name of bar.
  * @property {string} req.body.placeId - The placeId of bar.
- * @property {number} req.body.latitude - The latitude of bar. * 
- * @property {number} req.body.longitude - The longitude of bar. * 
- * 
+ * @property {number} req.body.latitude - The latitude of bar. *
+ * @property {number} req.body.longitude - The longitude of bar. *
+ *
  * @returns {Bar}
  */
 function create(req, res, next) {
-  saveBar(req.body.name, req.body.placeId, req.body.longitude, req.body.latitude)
+  saveBar(req.body)
   .then(savedBar => res.json(savedBar))
   .catch(e => next(e))
 
@@ -70,21 +70,18 @@ function create(req, res, next) {
  * Save a new bar to the data base
  * @property {string} name - The name of bar.
  * @property {string} placeId - The placeId of bar.
- * @property {number} latitude - The latitude of bar. * 
- * @property {number} longitude - The longitude of bar. * 
- * 
+ * @property {number} latitude - The latitude of bar. *
+ * @property {number} longitude - The longitude of bar. *
+ *
  * @returns {Bar}
  */
-function saveBar(name, placeId, longitude, latitude){
-  const bar = new Bar({
-    name: name,
-    placeId: placeId,
-    location : { 
-      type: "Point",
-      coordinates: [longitude, latitude]
-    }
-  });
-  return bar.save()
+function saveBar(bar){
+  bar.location = {
+    type: "Point",
+      coordinates: [bar.longitude, bar.latitude]
+  };
+  const createdBar = new Bar(bar);
+  return createdBar.save();
 }
 
 /**
