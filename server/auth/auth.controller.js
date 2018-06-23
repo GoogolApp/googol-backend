@@ -48,6 +48,20 @@ const checkUser = (req, res, next) => {
   }
 };
 
+/**
+ * Checks if the loged owners has the permission for set the bar information.
+ */
+const checkBarOwner = async (req, res, next) => {
+  const ownerId = req.user._id;
+  req.user = await Owner.get(ownerId);
+  if (String(req.user.bar._id) === String(req.queryBar._id)) {
+    next();
+  } else {
+    const err = new APIError(ErrorMessages.FORBIDDEN_DEFAULT, httpStatus.FORBIDDEN, true);
+    next(err);
+  }
+};
+
 
 //OWNER AUTH
 
@@ -91,4 +105,4 @@ const checkOwner = (req, res, next) => {
   }
 };
 
-module.exports = {login, checkUser, ownerLogin, checkOwner};
+module.exports = {login, checkUser, ownerLogin, checkOwner, checkBarOwner};

@@ -14,6 +14,23 @@ function load(req, res, next, id) {
 }
 
 /**
+ * Update the bar promo
+ *
+ * @property {string} req.body.promo - The new promo value.
+ */
+async function updateBarPromo(req, res, next) {
+  const bar = req.queryBar;
+  const promo = req.body.promo;
+  bar.promo = promo;
+  try {
+    const savedBar = await bar.save();
+    res.json(savedBar);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * Get bar
  * @returns {Bar}
  */
@@ -24,9 +41,9 @@ function get(req, res) {
 /**
  * Search bars
  * @property {string} req.query.keyword - Keyword to be searched for in name of bars.
- * @property {number} req.query.latitude - Latitude of the point of the center of the search 
- * @property {number} req.query.longitude -  Longitude of the point of the center of the search 
- * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers 
+ * @property {number} req.query.latitude - Latitude of the point of the center of the search
+ * @property {number} req.query.longitude -  Longitude of the point of the center of the search
+ * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers
  * @returns [{Bar}]
  */
 function geoSearch(req, res, next) {
@@ -54,9 +71,9 @@ function search(req, res, next) {
  * Create new bar
  * @property {string} req.body.name - The name of bar.
  * @property {string} req.body.placeId - The placeId of bar.
- * @property {number} req.body.latitude - The latitude of bar. * 
- * @property {number} req.body.longitude - The longitude of bar. * 
- * 
+ * @property {number} req.body.latitude - The latitude of bar. *
+ * @property {number} req.body.longitude - The longitude of bar. *
+ *
  * @returns {Bar}
  */
 function create(req, res, next) {
@@ -70,16 +87,16 @@ function create(req, res, next) {
  * Save a new bar to the data base
  * @property {string} name - The name of bar.
  * @property {string} placeId - The placeId of bar.
- * @property {number} latitude - The latitude of bar. * 
- * @property {number} longitude - The longitude of bar. * 
- * 
+ * @property {number} latitude - The latitude of bar. *
+ * @property {number} longitude - The longitude of bar. *
+ *
  * @returns {Bar}
  */
 function saveBar(name, placeId, longitude, latitude){
   const bar = new Bar({
     name: name,
     placeId: placeId,
-    location : { 
+    location : {
       type: "Point",
       coordinates: [longitude, latitude]
     }
@@ -112,4 +129,4 @@ function remove(req, res, next) {
 }
 
 
-module.exports = { load, get, create, list, remove, geoSearch, search, saveBar};
+module.exports = { load, get, create, list, remove, geoSearch, search, saveBar, updateBarPromo};

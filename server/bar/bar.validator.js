@@ -9,7 +9,10 @@ module.exports = {
       latitude: Joi.number().required(),
       longitude: Joi.number().required()
     }
+  },
+
+  // PATCH /api/bar/:barId/promo
+  editPromo: {
+    promo: Joi.string().required()
   }
-
-
-}
+};
