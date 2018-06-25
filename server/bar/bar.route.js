@@ -1,7 +1,11 @@
 const express = require('express');
 
+const expressJwt = require('express-jwt');
+const config = require('../../config/config');
+
 const validate = require('express-validation');
 const paramValidation = require('./bar.validator');
+const authCtrl = require('../auth/auth.controller')
 
 const barCtrl = require('./bar.controller');
 
@@ -29,6 +33,12 @@ router.route('/:barId')
 
   /** DELETE /api/:barId - Delete bar */
   .delete(barCtrl.remove);
+
+router.route('/:barId/promo')
+/** PATCH /api/users/:barId/promo - Edit bar promo */
+  .patch([validate(paramValidation.editPromo), expressJwt({ secret: config.jwtSecret }), authCtrl.checkBarOwner], barCtrl.updateBarPromo);
+
+
 
 
 /** Load bar when API with barId route parameter is hit */

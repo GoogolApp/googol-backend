@@ -14,6 +14,23 @@ function load(req, res, next, id) {
 }
 
 /**
+ * Update the bar promo
+ *
+ * @property {string} req.body.promo - The new promo value.
+ */
+async function updateBarPromo(req, res, next) {
+  const bar = req.queryBar;
+  const promo = req.body.promo;
+  bar.promo = promo;
+  try {
+    const savedBar = await bar.save();
+    res.json(savedBar);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * Get bar
  * @returns {Bar}
  */
@@ -109,4 +126,4 @@ function remove(req, res, next) {
 }
 
 
-module.exports = { load, get, create, list, remove, geoSearch, search, saveBar};
+module.exports = { load, get, create, list, remove, geoSearch, search, saveBar, updateBarPromo};
