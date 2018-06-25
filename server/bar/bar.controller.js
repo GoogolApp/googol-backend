@@ -77,7 +77,7 @@ function search(req, res, next) {
  * @returns {Bar}
  */
 function create(req, res, next) {
-  saveBar(req.body.name, req.body.placeId, req.body.longitude, req.body.latitude)
+  saveBar(req.body)
   .then(savedBar => res.json(savedBar))
   .catch(e => next(e))
 
@@ -92,16 +92,13 @@ function create(req, res, next) {
  *
  * @returns {Bar}
  */
-function saveBar(name, placeId, longitude, latitude){
-  const bar = new Bar({
-    name: name,
-    placeId: placeId,
-    location : {
-      type: "Point",
-      coordinates: [longitude, latitude]
-    }
-  });
-  return bar.save()
+function saveBar(bar){
+  bar.location = {
+    type: "Point",
+      coordinates: [bar.longitude, bar.latitude]
+  };
+  const createdBar = new Bar(bar);
+  return createdBar.save();
 }
 
 /**
