@@ -16,6 +16,12 @@ const BarSchema = new mongoose.Schema({
   name: {
     type: String,
   },
+  address: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
   location: {
     type: { type: String },
     coordinates: [Number]
@@ -23,9 +29,6 @@ const BarSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  },
-  banner: {
-    type: String,
   },
   promo: {
     type: String,
@@ -72,7 +75,7 @@ BarSchema.statics = {
    */
   get(id) {
     return this.findById(id)
-      .populate('eventHistory')
+      //.populate('eventHistory')
       .exec()
       .then((bar) => {
         if (bar) {
@@ -100,8 +103,8 @@ BarSchema.statics = {
   /**
    * Search for bars with geolocalization
    * @param {ObjectId} keyword - The name to search for.
-   * @param {ObjectId} latitude - Latitude of the point of the center of the search 
-   * @param {ObjectId} longitude - Latitude of the point of the center of the search 
+   * @param {ObjectId} latitude - Latitude of the point of the center of the search
+   * @param {ObjectId} longitude - Latitude of the point of the center of the search
    * @param {ObjectId} maximumDistance - range of search- Optional
    * @returns {Promise<Bar, APIError>}
    *

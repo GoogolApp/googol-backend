@@ -60,7 +60,7 @@ function setMyBar(req, res, next) {
         owner.bar = bar;
         return owner;
       }else{
-        return barCtrl.saveBar(req.body.name, req.body.placeId, req.body.longitude, req.body.latitude)
+        return barCtrl.saveBar(req.body)
         .then((savedBar) => {
           owner.bar = savedBar;
           return owner;
