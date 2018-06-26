@@ -4,25 +4,27 @@ const Bar = require('../bar/bar.model');
 const matchService = require('../match/match.service');
 
 const ErrorMessages = require('../helpers/ErrorMessages');
+const APIError = require('../helpers/APIError');
+const httpStatus = require('http-status');
+const Utils = require('../helpers/Utils')
+
 
 const REPUTATION_RISE_CREATE_EVENT = 5;
 
 /**
  * Load event and append to req.
  */
-function load(req, res, next, id) {
-  try{
-    Event.get(id)
-    .then(async (event) => {
-      cachedMatch = await matchService.getMatchById(event.match);
-      event = event.toObject();
-      event.match = cachedMatch;
-      req.queryEvent = event;
-      return next();
-      })
-      .catch(e => next(e));
-  }catch(err){
-    next(new Error(ErrorMessages.EVENT_NOT_FOUND + err.message))
+async function load (req, res, next, id) {
+  try {
+    let event = await Event.get(id)
+    const cachedMatch = await matchService.getMatchById(event.match);
+    event = event.toObject();
+    event.match = cachedMatch;
+    req.queryEvent = event;
+    console.log(event);
+    return next();
+  } catch(err) {
+    next(new Error(ErrorMessages.EVENT_NOT_FOUND + err.message));
   }
 }
 
@@ -61,7 +63,7 @@ function geoList(req, res, next) {
         .then(events => {
           events = events.map((event) => {
             const eventDistance =  event.toObject()
-            eventDistance.distance = Math.round(distance(req.query.latitude, req.query.longitude, event.bar.location.coordinates[0], event.bar.location.coordinates[1]));
+            eventDistance.distance = Math.round(Utils.distance(req.query.latitude, req.query.longitude, event.bar.location.coordinates[0], event.bar.location.coordinates[1]));
             return eventDistance;
           });
           events.sort(compare);
@@ -73,22 +75,8 @@ function geoList(req, res, next) {
 
 }
 
-function distance(lat1, lon1, lat2, lon2) {
-  var p = 0.017453292519943295;    // Math.PI / 180
-  var c = Math.cos;
-  var a = 0.5 - c((lat2 - lat1) * p)/2 + 
-          c(lat1 * p) * c(lat2 * p) * 
-          (1 - c((lon2 - lon1) * p))/2;
-
-  return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-}
-
 function compare(a,b) {
-  if (a.distance < b.distance)
-    return -1;
-  if (a.distance > b.distance)
-    return 1;
-  return 0;
+  return (a.distance - b.distance);
 }
 
 /**
@@ -100,9 +88,14 @@ function compare(a,b) {
  */
 async function create(req, res, next) {
   try {
-    cachedMatch = await matchService.getMatchById(req.body.matchId);
-    if(req.body.userId){
-      await _reputationAddition(req.body.userId, REPUTATION_RISE_CREATE_EVENT);
+    const cachedMatch = await matchService.getMatchById(req.body.matchId);
+    const dateIsValid = matchService.isFutureMatch(cachedMatch);
+    if (!dateIsValid) {
+      const err = new APIError(ErrorMessages.INVALID_MATCH_DATE, httpStatus.BAD_REQUEST);
+      return next(err);
+    }
+    if (req.user.role === 'user') {
+      await _reputationAddition(req.user._id, REPUTATION_RISE_CREATE_EVENT);
     }
     _saveEvent(req.body.matchId, req.body.barId, req.body.userId)
       .then(event => res.json(event))
@@ -111,6 +104,7 @@ async function create(req, res, next) {
     next(err);
   }
 }
+
 
 /**
  * Save event

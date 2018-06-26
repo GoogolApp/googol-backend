@@ -11,6 +11,7 @@ module.exports = {
   //match
   ERROR_RETRIEVING_MATCHES: 'Algo inesperado ocorreu ao recuperar as partidas.',
   MATCH_NOT_FOUND: 'Algo inesperado ocorreu ao recuperar a partida',
+  INVALID_MATCH_DATE: 'Partida com data inválida. O evento não pode ser criado.',
   
 
   //team
@@ -32,7 +33,6 @@ module.exports = {
   ERROR_CREATE_EVENT: 'Evento já existente.',
   ERROR_REPUTATION: 'Erro ao adicionar reputação ao usuário: ',
   EVENT_NOT_FOUND: 'Evento não encontrado.'
-  
   
 
 };

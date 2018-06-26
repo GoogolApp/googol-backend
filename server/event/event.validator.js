@@ -9,8 +9,7 @@ module.exports = {
   createEvent: {
     body: {
       matchId: objectIdJoiValidator.required(),
-      barId: objectIdJoiValidator.required(),
-      userId: objectIdJoiValidator
+      barId: objectIdJoiValidator.required()
     }
   },
   
@@ -23,7 +22,8 @@ module.exports = {
   geoList:{
     body: {
       latitude: Joi.number().required(),
-      longitude: Joi.number().required()
+      longitude: Joi.number().required(),
+      maxDistance: Joi.number()
     }
   }
   

@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
+const Bar = require('../bar/bar.model');
+
 
 
 const DUPLICATED_KEY_MONGO_ERROR_CODE = 11000;
@@ -43,6 +45,21 @@ EventSchema.index({ match: 1, bar: 1 }, { unique: true });
  * - validations
  * - virtuals
  */
+
+EventSchema.pre('save', async function (next) {
+  try {
+    const barId = this.bar;
+    const bar = await Bar.findOne(barId);
+    if (bar!= null) {
+      next();
+    } else {
+      next( new Error(ErrorMessages.BAR_NOT_FOUND));
+    }
+  } catch (err) {
+    next(err);
+  }
+
+});
 
 EventSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === DUPLICATED_KEY_MONGO_ERROR_CODE) { 

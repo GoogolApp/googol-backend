@@ -16,11 +16,11 @@ router.route('/')
 
 router.route('/geosearch')
   /** GET /api/geoSearch - Get list of bars with localization */
-  .get(barCtrl.geoSearch)
+  .get(barCtrl.geoSearch);
 
 router.route('/search')
   /** GET /api/search - Get list of bars */
-  .get(barCtrl.search)
+  .get(barCtrl.search);
 
 router.route('/:barId')
 

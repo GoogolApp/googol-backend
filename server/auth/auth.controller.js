@@ -7,6 +7,9 @@ const config = require('../../config/config');
 const User = require('../user/user.model');
 const Owner = require('../owner/owner.model');
 
+const USER_ROLE = 'user';
+const OWNER_ROLE = 'owner';
+
 /**
  * Returns jwt token if valid username and password is provided
  * @param req
@@ -23,7 +26,8 @@ const login = (req, res, next) => {
       const token = jwt.sign({
         username: user.username,
         _id: user._id,
-        email: user.email
+        email: user.email,
+        role: USER_ROLE
       }, config.jwtSecret);
       return res.json({
         token,
@@ -66,7 +70,8 @@ const ownerLogin = (req, res, next) => {
     if (owner && ownerEmail === owner.email && owner.comparePassword(ownerPassword, owner.password)) {
       const token = jwt.sign({
         _id: owner._id,
-        email: owner.email
+        email: owner.email,
+        role: OWNER_ROLE
       }, config.jwtSecret);
       return res.json({
         token,
