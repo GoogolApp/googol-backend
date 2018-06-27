@@ -54,6 +54,8 @@ function geoSearch(req, res, next) {
     .catch(e => next(e));
 }
 
+
+
 /**
  * Search bars
  * @property {string} req.query.keyword - Keyword to be searched for in name of bars.

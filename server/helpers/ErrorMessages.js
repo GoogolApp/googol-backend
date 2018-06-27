@@ -10,6 +10,9 @@ module.exports = {
 
   //match
   ERROR_RETRIEVING_MATCHES: 'Algo inesperado ocorreu ao recuperar as partidas.',
+  MATCH_NOT_FOUND: 'Algo inesperado ocorreu ao recuperar a partida',
+  INVALID_MATCH_DATE: 'Partida com data inválida. O evento não pode ser criado.',
+  
 
   //team
   INVALID_TEAM_ID: 'O valor passado não corresponde ao id de um time válido',
@@ -24,5 +27,12 @@ module.exports = {
   //bar
   BAR_NOT_FOUND: 'Bar não encontrado.',
   BAR_TAKEN: 'Bar já foi reivindicado por outro usuário',
-  ERROR_CREATE_BAR: 'Erro ao cadastrar o bar no sistema'
+  ERROR_CREATE_BAR: 'Erro ao cadastrar o bar no sistema',
+
+  //event
+  ERROR_CREATE_EVENT: 'Evento já existente.',
+  ERROR_REPUTATION: 'Erro ao adicionar reputação ao usuário: ',
+  EVENT_NOT_FOUND: 'Evento não encontrado.'
+  
+
 };
