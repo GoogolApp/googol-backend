@@ -21,10 +21,15 @@ function load(req, res, next, id) {
 async function updateBarPromo(req, res, next) {
   const bar = req.queryBar;
   const promo = req.body.promo;
-  bar.promo = promo;
+  bar.promo = {};
+  bar.promo.content = promo;
+  const createdAt = new Date();
+  bar.promo.createdAt = createdAt;
   try {
     const savedBar = await bar.save();
-    res.json(savedBar);
+    const barObj = savedBar.toObject();
+    barObj.promo.createdAt = new Date(barObj.promo.createdAt.valueOf() - barObj.promo.createdAt.getTimezoneOffset() * 60000);
+    res.json(barObj);
   } catch (err) {
     next(err);
   }

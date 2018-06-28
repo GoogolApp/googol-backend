@@ -15,6 +15,8 @@ module.exports = {
 
   // PATCH /api/bar/:barId/promo
   editPromo: {
-    promo: Joi.string().required()
+    body: {
+      promo: Joi.string().required()
+    }
   }
 };
