@@ -257,4 +257,21 @@ async function _unfollowBar (userDoc, barId) {
   }
 }
 
-module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars, getFollowing, getFollowers};
+async function getFollowingBarsPromo (req, res, next) {
+  try {
+    const user = req.queryUser;
+    const followedBars = user.followingBars;
+
+    const promises = followedBars.map(barId => {
+      return Bar.get(barId);
+    });
+
+    const bars = await Promise.all(promises);
+
+    res.json(bars.map(bar => bar.promo))
+  } catch (err) {
+    next(new APIError(/*ErrorMessages.ERROR_GETTING_PROMO_FROM_FAVORITE_BARS*/ err, httpStatus.BAD_REQUEST, true));
+  }
+}
+
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars, getFollowing, getFollowers, getFollowingBarsPromo};

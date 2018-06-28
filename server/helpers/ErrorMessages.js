@@ -7,6 +7,7 @@ module.exports = {
   ERROR_ON_UNFOLLOW_USER: 'Não foi possível deixar de seguir o usuário.',
   ERROR_ON_FOLLOW_TEAM: 'Não foi possível seguir o time.',
   ERROR_ON_UNFOLLOW_TEAM: 'Não foi possível deixar de seguir o time.',
+  ERROR_GETTING_PROMO_FROM_FAVORITE_BARS: 'Não foi possível obter as promoções dos seus bares favoritos.',
 
   //match
   ERROR_RETRIEVING_MATCHES: 'Algo inesperado ocorreu ao recuperar as partidas.',
