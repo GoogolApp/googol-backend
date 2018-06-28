@@ -201,6 +201,17 @@ UserSchema.statics = {
     .exec()
   },
 
+  getFollowingBars (id) {
+    return this.findById(id)
+      .populate({
+        path: 'followingBars',
+        select: '_id promo name'
+      })
+      .select({followingBars:1})
+      .exec()
+      .then(user => user.followingBars);
+  },
+
   followersUsers (id) {
     return this.findById(id)
     .populate({
@@ -221,7 +232,7 @@ UserSchema.statics = {
     return this.findByIdAndUpdate(user, { $pull: { favTeams: teamId } }, { safe: true, new: true })
     .exec();
   }
-  
+
 
 };
 

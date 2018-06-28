@@ -260,17 +260,11 @@ async function _unfollowBar (userDoc, barId) {
 async function getFollowingBarsPromo (req, res, next) {
   try {
     const user = req.queryUser;
-    const followedBars = user.followingBars;
+    const followedBars = await User.getFollowingBars(user._id);
 
-    const promises = followedBars.map(barId => {
-      return Bar.get(barId);
-    });
-
-    const bars = await Promise.all(promises);
-
-    res.json(bars.map(bar => bar.promo))
+    res.json(followedBars);
   } catch (err) {
-    next(new APIError(/*ErrorMessages.ERROR_GETTING_PROMO_FROM_FAVORITE_BARS*/ err, httpStatus.BAD_REQUEST, true));
+    next(new APIError(ErrorMessages.ERROR_GETTING_PROMO_FROM_FAVORITE_BARS, httpStatus.BAD_REQUEST, true));
   }
 }
 
