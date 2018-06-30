@@ -74,6 +74,12 @@ module.exports = {
     }
   },
 
+  getFollowingBarsPromo: {
+    params: {
+      userId: objectIdJoiValidator
+    }
+  },
+
   validateFavTeam: (req, res, next) => {
     const favTeams = req.body.favTeamId;
     if (!ObjectId.isValid(favTeams)) {

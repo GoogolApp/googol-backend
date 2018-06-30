@@ -1,5 +1,5 @@
 const Bar = require('./bar.model');
-
+const DateUtils = require('../helpers/DateUtils');
 
 /**
  * Load bar and append to req.
@@ -21,7 +21,10 @@ function load(req, res, next, id) {
 async function updateBarPromo(req, res, next) {
   const bar = req.queryBar;
   const promo = req.body.promo;
-  bar.promo = promo;
+  bar.promo = {};
+  bar.promo.content = promo;
+  const createdAt = DateUtils.convertToBrazilTimezone(new Date());
+  bar.promo.createdAt = createdAt;
   try {
     const savedBar = await bar.save();
     res.json(savedBar);

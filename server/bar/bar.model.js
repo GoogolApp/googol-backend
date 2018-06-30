@@ -31,7 +31,8 @@ const BarSchema = new mongoose.Schema({
     default: Date.now
   },
   promo: {
-    type: String,
+    content: String,
+    createdAt: Date
   },
   followers: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
