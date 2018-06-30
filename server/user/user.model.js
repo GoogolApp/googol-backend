@@ -209,7 +209,7 @@ UserSchema.statics = {
       })
       .select({followingBars:1})
       .exec()
-      .then(user => user.followingBars);
+      .then(user => user && user.followingBars);
   },
 
   followersUsers (id) {
