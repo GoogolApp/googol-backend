@@ -10,6 +10,9 @@ const Utils = require('../helpers/Utils')
 
 
 const REPUTATION_RISE_CREATE_EVENT = 5;
+const REPUTATION_RISE_CONFIRM = 10;
+const CONFIRM = "confirm";
+REPUTATION_DECREASE_UNCONFIRM = -5;
 
 /**
  * Load event and append to req.
@@ -135,6 +138,42 @@ async function _reputationAddition (userId, value) {
   }
 }
 
+async function confirmation (req, res, next){ //Com findById no lugar de update talvez funcione melhor pq retorna o documento
+  let event = await Event.get(req.queryEvent._id);
+  const user = req.user;
+  const operation = req.body.operation;
+  try {
+    event = await ( operation === CONFIRM ?
+    _confirmEvent(event, user) :
+    _unconfirmEvent(event, user));
+    res.json(event);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function _confirmEvent (event, user){
+  try{ 
+    if (user.role === 'user') {
+      await _reputationAddition(user._id, REPUTATION_RISE_CONFIRM);
+    }
+    return event.confirmUser(user._id);
+  } catch (err) {
+    throw err;
+  }
+
+}
+
+async function _unconfirmEvent (event, userId){
+  try{
+    if (user.role === 'user') {
+      await _reputationAddition(user._id, REPUTATION_DECREASE_UNCONFIRM);
+    }
+    return event.unconfirmUser(user._id);
+  } catch (err) {
+    throw err;
+  }
+}
 
 
 /**
@@ -148,4 +187,7 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, remove, list, geoList};
+
+
+
+module.exports = { load, get, create, remove, list, geoList, confirmation};

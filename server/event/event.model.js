@@ -73,6 +73,17 @@ EventSchema.post('save', function (error, doc, next) {
 /**
  * Methods
  */
+EventSchema.method({
+  confirmUser (userId) {
+    return this.update({$addToSet: {attendants: userId}}, {safe: true, new: true});
+  },
+  
+  unconfirmUser (userId) {
+    return this.update({$pull: {attendants: userId}}, {safe: true, new: true});
+  }
+
+});
+
 
 /**
  * Statics

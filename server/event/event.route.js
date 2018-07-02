@@ -23,7 +23,11 @@ router.route('/geoList')
 
 router.route('/:eventId')
   /** GET /api/event - Get event populating attendants */
-  .get(validate(paramValidation.getById), eventCtrl.get);
+  .get(validate(paramValidation.getById), eventCtrl.get)
+  /** GET /api/event - Get event populating attendants */
+  .patch([validate(paramValidation.confirmEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.confirmation)
+  /** GET /api/event - Get event populating attendants */
+  .delete([validate(paramValidation.deleteEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.remove);
 
 /** Load event when API with eventId route parameter is hit */
 router.param('eventId', eventCtrl.load);
