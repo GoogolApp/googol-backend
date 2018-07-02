@@ -138,38 +138,43 @@ async function _reputationAddition (userId, value) {
   }
 }
 
-async function confirmation (req, res, next){ //Com findById no lugar de update talvez funcione melhor pq retorna o documento
-  let event = await Event.get(req.queryEvent._id);
+
+/**
+ * Confirm or unconfirm an Enser on an event attendants list.
+ * @property {string} req.body.operation - Inform if it's a confirm or unconfirm operation
+ * @returns {Event}
+ */
+async function confirmation (req, res, next){ 
   const user = req.user;
   const operation = req.body.operation;
   try {
-    event = await ( operation === CONFIRM ?
-    _confirmEvent(event, user) :
-    _unconfirmEvent(event, user));
+    const event = await ( operation === CONFIRM ?
+    _confirmEvent(req.queryEvent, user) :
+    _unconfirmEvent(req.queryEvent, user));
     res.json(event);
   } catch (err) {
     next(err);
   }
 }
 
-async function _confirmEvent (event, user){
-  try{ 
+async function _confirmEvent (event, user) {
+  try { 
     if (user.role === 'user') {
       await _reputationAddition(user._id, REPUTATION_RISE_CONFIRM);
     }
-    return event.confirmUser(user._id);
+    return Event.confirmUser(event._id, user._id);
   } catch (err) {
     throw err;
   }
 
 }
 
-async function _unconfirmEvent (event, userId){
-  try{
+async function _unconfirmEvent (event, user) {
+  try {
     if (user.role === 'user') {
       await _reputationAddition(user._id, REPUTATION_DECREASE_UNCONFIRM);
     }
-    return event.unconfirmUser(user._id);
+    return Event.unconfirmUser(event._id, user._id);
   } catch (err) {
     throw err;
   }
@@ -181,6 +186,7 @@ async function _unconfirmEvent (event, userId){
  * @returns {Event}
  */
 function remove(req, res, next) {
+  //TODO: validar se user é quem publicou evento ou se é o owner do bar do evento.
   const event = req.queryEvent;
   event.remove()
     .then(deletedEvent => res.json(deletedEvent))

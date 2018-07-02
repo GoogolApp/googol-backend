@@ -24,9 +24,9 @@ router.route('/geoList')
 router.route('/:eventId')
   /** GET /api/event - Get event populating attendants */
   .get(validate(paramValidation.getById), eventCtrl.get)
-  /** GET /api/event - Get event populating attendants */
+  /** PATCH /api/event - Confirm or unconfirm an user on an event attendents list */
   .patch([validate(paramValidation.confirmEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.confirmation)
-  /** GET /api/event - Get event populating attendants */
+  /** DELETE /api/event - Deletes an event. */
   .delete([validate(paramValidation.deleteEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.remove);
 
 /** Load event when API with eventId route parameter is hit */
