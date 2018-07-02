@@ -10,6 +10,9 @@ const Utils = require('../helpers/Utils')
 
 
 const REPUTATION_RISE_CREATE_EVENT = 5;
+const REPUTATION_RISE_CONFIRM = 10;
+const CONFIRM = "confirm";
+REPUTATION_DECREASE_UNCONFIRM = -5;
 
 /**
  * Load event and append to req.
@@ -136,16 +139,61 @@ async function _reputationAddition (userId, value) {
 }
 
 
+/**
+ * Confirm or unconfirm an Enser on an event attendants list.
+ * @property {string} req.body.operation - Inform if it's a confirm or unconfirm operation
+ * @returns {Event}
+ */
+async function confirmation (req, res, next){ 
+  const user = req.user;
+  const operation = req.body.operation;
+  try {
+    const event = await ( operation === CONFIRM ?
+    _confirmEvent(req.queryEvent, user) :
+    _unconfirmEvent(req.queryEvent, user));
+    res.json(event);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function _confirmEvent (event, user) {
+  try { 
+    if (user.role === 'user') {
+      await _reputationAddition(user._id, REPUTATION_RISE_CONFIRM);
+    }
+    return Event.confirmUser(event._id, user._id);
+  } catch (err) {
+    throw err;
+  }
+
+}
+
+async function _unconfirmEvent (event, user) {
+  try {
+    if (user.role === 'user') {
+      await _reputationAddition(user._id, REPUTATION_DECREASE_UNCONFIRM);
+    }
+    return Event.unconfirmUser(event._id, user._id);
+  } catch (err) {
+    throw err;
+  }
+}
+
 
 /**
  * Delete event.
  * @returns {Event}
  */
 function remove(req, res, next) {
+  //TODO: validar se user é quem publicou evento ou se é o owner do bar do evento.
   const event = req.queryEvent;
   event.remove()
     .then(deletedEvent => res.json(deletedEvent))
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, remove, list, geoList};
+
+
+
+module.exports = { load, get, create, remove, list, geoList, confirmation};

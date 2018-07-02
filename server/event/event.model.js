@@ -74,6 +74,7 @@ EventSchema.post('save', function (error, doc, next) {
  * Methods
  */
 
+
 /**
  * Statics
  */
@@ -126,6 +127,18 @@ EventSchema.statics = {
       .sort({distance: 1})
       .limit(+limit)
       .exec();
+  },
+
+  confirmUser(eventId, userId) {
+    return this.findByIdAndUpdate(eventId,
+      {$addToSet: {attendants: userId}}, {safe: true, new: true})
+    .exec();
+  },
+
+  unconfirmUser(eventId, userId) {
+    return this.findByIdAndUpdate(eventId,
+      {$pull: {attendants: userId}}, {safe: true, new: true})
+    .exec();
   }
 };
 
