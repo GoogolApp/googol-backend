@@ -9,4 +9,14 @@ const list = (req, res, next) => {
     .catch(err => next(err));
 };
 
-module.exports = { list };
+const getTeamById = async (req, res, next) => {
+  try {
+    const teamId = req.params.teamId;
+    const team = await teamService.getTeamById(teamId);
+    res.json(team);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {list, getTeamById};
