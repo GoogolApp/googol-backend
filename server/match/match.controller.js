@@ -30,4 +30,14 @@ const getMatches = (req, res, next) => {
     .catch(err => next(new APIError(ErrorMessages.ERROR_RETRIEVING_MATCHES, httpStatus.INTERNAL_SERVER_ERROR, true)));
 };
 
-module.exports = {getMatches};
+const getMatchById = async (req, res, next) => {
+  const matchId = req.params.matchId;
+  try {
+    const match = await matchService.getMatchById(matchId);
+    res.json(match);
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {getMatches, getMatchById};
