@@ -42,11 +42,23 @@ function get(req, res) {
  * @property {number} req.query.limit - Limit number of events to be returned.
  * @returns {Events[]}
  */
-function list(req, res, next) {
-  const { limit = 50, skip = 0 } = req.query;
-  Event.list({ limit, skip })
-    .then(events => res.json(events))
-    .catch(e => next(e));
+async function list(req, res, next) {
+  try{
+    const { limit = 50, skip = 0 } = req.query;
+    let events = await Event.list({ limit, skip });
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventMatch = event.toObject();
+        eventMatch.match = cachedMatch;
+        return eventMatch;
+      });
+    });
+    events = await Promise.all(events);
+    events.sort(compare);
+    res.json(events);
+  } catch (err) {
+    next(err);
+  }
 }
 
 /**
@@ -56,23 +68,26 @@ function list(req, res, next) {
  * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers 
  * @returns [{Event}]
  */
-function geoList(req, res, next) {
-  Bar.geolocationSearch('', req.query.latitude, req.query.longitude, req.query.maxDistance)
-    .then((geoBarList) => {
-      return Event.listGeolocation(geoBarList, req.query.latitude, req.query.longitude, req.query.maxDistance)
-        .then(events => {
-          events = events.map((event) => {
-            const eventDistance =  event.toObject()
-            eventDistance.distance = Math.round(Utils.distance(req.query.latitude, req.query.longitude, event.bar.location.coordinates[0], event.bar.location.coordinates[1]));
-            return eventDistance;
-          });
-          events.sort(compare);
-          res.json(events)
-        })
-        .catch(e => next(e));
-    })
-    .catch(e => next(e));
-
+async function geoList(req, res, next) {
+  try {
+    const {latitude, longitude, maxDistance} = req.query;
+    const geoBarList = await Bar.geolocationSearch('', latitude, longitude, maxDistance);
+    let events = await Event.listGeolocation(geoBarList, latitude, longitude, maxDistance);
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventDistance = event.toObject();
+        eventDistance.match = cachedMatch;
+        const [coord1, coord2] = event.bar.location.coordinates;
+        eventDistance.distance = Math.round(Utils.distance(latitude, longitude, coord1, coord2));
+        return eventDistance;
+      });
+    });
+    events = await Promise.all(events);
+    events.sort(compare);
+    res.json(events);
+  } catch (err) {
+    next(err);
+  }
 }
 
 function compare(a,b) {

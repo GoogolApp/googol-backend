@@ -87,7 +87,7 @@ EventSchema.statics = {
   
   get(id) {
     return this.findById(id)
-      .populate([{path:'bar', select:'_id name'}, {path:'attendants', select:'username email'}])
+      .populate([{path:'bar'}, {path:'attendants'}])
       .exec()
       .then((event) => {
         if (event) {
@@ -106,7 +106,7 @@ EventSchema.statics = {
    */
   list({ skip = 0, limit = 50 } = {}) {
     return this.find()
-      .populate([{path:'bar', select:'_id name'}, {path:'attendants', select:'username email'}])
+      .populate([{path:'bar'}, {path:'attendants'}])
       .sort({ createdAt: -1 })
       .skip(+skip)
       .limit(+limit)
@@ -121,7 +121,7 @@ EventSchema.statics = {
    * name distance/*/
   listGeolocation(barList, { skip = 0, limit = 50 } = {}) {
     return this.find({'bar': {$in: barList}})
-      .populate([{path:'bar', select:'_id location'}, {path:'attendants', select:'username email'}])
+      .populate([{path:'bar'}, {path:'attendants', select:'username email'}])
       .skip(+skip)
       .sort({distance: 1})
       .limit(+limit)

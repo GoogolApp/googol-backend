@@ -20,11 +20,10 @@ module.exports = {
   },
 
   geoList:{
-    body: {
-      latitude: Joi.number().required(),
-      longitude: Joi.number().required(),
-      maxDistance: Joi.number()
-    }
+    latitude: Joi.number().required(),
+    longitude: Joi.number().required(),
+    maxDistance: Joi.number()
+    
   }
   
 };
