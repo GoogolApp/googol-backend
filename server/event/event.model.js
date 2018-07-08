@@ -27,6 +27,11 @@ const EventSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
   },
+  state: {
+    type: String,
+    enum : ['CREATED_BY_OWNER','CREATED_BY_USER', 'CONFIRMED_BY_OWNER', 'UNCORFIMED_BY_OWNER', 'DELETED_BY_USER'],
+    default: 'CREATED_BY_USER'
+  },
   createdAt: {
     type: Date,
     default: Date.now

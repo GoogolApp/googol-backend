@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  dailyReputation: {
+    type: Number,
+    default: 0
+  },
   following: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
   }],
@@ -106,8 +110,12 @@ UserSchema.method({
     return this.update({$pull: {followingBars: barId}}, {safe: true, new: true});
   },
 
-  reputationAddition (value) {
+  directReputationAddition (value) {
     return this.update({$inc: {reputation: value}});
+  }, 
+
+  dailyReputationAddition (value) {
+    return this.update({$inc: {dailyReputation: value}});
   }
 });
 
