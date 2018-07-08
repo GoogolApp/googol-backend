@@ -82,7 +82,7 @@ function compare(a,b) {
 }
 
 /**
- * Create new event
+ * Create new event 
  * @property {string} req.body.matchId - The Id of a match.
  * @property {string} req.body.barId - The Id of a bar.
  * @property {string} req.body.userId - The Id of an User. Optional.
@@ -111,7 +111,7 @@ async function create(req, res, next) {
 
 
 /**
- * Save event
+ * Save event by User
  * @returns {Promise.<*>}
  * @private
  */
@@ -127,7 +127,7 @@ function _saveEventUser (matchId, barId, userId) {
 
 
 /**
- * Save event
+ * Save event by Owner 
  * @returns {Promise.<*>}
  * @private
  */

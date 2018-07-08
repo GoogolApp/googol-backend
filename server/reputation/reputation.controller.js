@@ -1,6 +1,12 @@
 const User = require('../user/user.model');
 const reputatioConstants = require('../reputation/reputation.constants');
 
+
+/**
+ * Add reputation for the creator of an Event
+ * @property {string} userId
+ * @returns Number
+ */
 async function reputationCreateEvent(userId){
   try {
     const user = await User.get(userId);
