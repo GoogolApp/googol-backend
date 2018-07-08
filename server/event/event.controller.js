@@ -9,9 +9,9 @@ const ErrorMessages = require('../helpers/ErrorMessages');
 const APIError = require('../helpers/APIError');
 const httpStatus = require('http-status');
 const Utils = require('../helpers/Utils')
+const States = require('./event.state.js'); 
 
 
-const REPUTATION_RISE_CREATE_EVENT = 5;
 
 /**
  * Load event and append to req.
@@ -120,7 +120,7 @@ function _saveEventUser (matchId, barId, userId) {
     match: matchId,
     bar: barId,
     user: userId,
-    state: 'CREATED_BY_USER'
+    state: States.CREATED_BY_USER
   });
   return event.save();
 }
@@ -136,7 +136,7 @@ function _saveEventOwner (matchId, barId) {
     match: matchId,
     bar: barId,
     user: userId,
-    state: 'CREATED_BY_OWNER'
+    state: States.CREATED_BY_OWNER
   });
   return event.save();
 }
