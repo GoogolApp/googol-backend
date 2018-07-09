@@ -5,7 +5,7 @@ const objectIdJoiValidator = Joi.string().regex(/^[0-9a-fA-F]{24}$/, "mongoDB ob
 
 
 module.exports = {
-  // POST /api/owner
+  //POST /api/event
   createEvent: {
     body: {
       matchId: objectIdJoiValidator.required(),
@@ -13,12 +13,13 @@ module.exports = {
     }
   },
   
+  //GET /api/event
   getById:{
     params: {
       eventId: objectIdJoiValidator.required()
     }
   },
-
+  // GET /api/event
   geoList:{
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),

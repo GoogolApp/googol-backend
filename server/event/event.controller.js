@@ -1,15 +1,17 @@
 const Event = require('./event.model');
 const User = require('../user/user.model');
 const Bar = require('../bar/bar.model');
+
 const matchService = require('../match/match.service');
+const reputationController = require('../reputation/reputation.controller');
 
 const ErrorMessages = require('../helpers/ErrorMessages');
 const APIError = require('../helpers/APIError');
 const httpStatus = require('http-status');
 const Utils = require('../helpers/Utils')
+const States = require('./event.state.js'); 
 
 
-const REPUTATION_RISE_CREATE_EVENT = 5;
 
 /**
  * Load event and append to req.
@@ -95,7 +97,7 @@ function compare(a,b) {
 }
 
 /**
- * Create new event
+ * Create new event 
  * @property {string} req.body.matchId - The Id of a match.
  * @property {string} req.body.barId - The Id of a bar.
  * @property {string} req.body.userId - The Id of an User. Optional.
@@ -110,11 +112,13 @@ async function create(req, res, next) {
       return next(err);
     }
     if (req.user.role === 'user') {
-      await _reputationAddition(req.user._id, REPUTATION_RISE_CREATE_EVENT);
+      const event = await _saveEventUser(req.body.matchId, req.body.barId, req.body.userId);
+      let reputation = await reputationController.reputationCreateEvent(req.user._id);
+      res.json({'repIncrement': reputation, 'event': event});
+    } else if (req.user.role === 'owner'){
+      const event = await _saveEventOwner(req.body.matchId, req.body.barId);
+      res.json(event);
     }
-    _saveEvent(req.body.matchId, req.body.barId, req.body.userId)
-      .then(event => res.json(event))
-      .catch(e => next(e));
   } catch (err) {
     next(err);
   }
@@ -122,34 +126,35 @@ async function create(req, res, next) {
 
 
 /**
- * Save event
+ * Save event by User
  * @returns {Promise.<*>}
  * @private
  */
-function _saveEvent (matchId, barId, userId) {
+function _saveEventUser (matchId, barId, userId) {
   const event = new Event({
     match: matchId,
     bar: barId,
-    user: userId
+    user: userId,
+    state: States.CREATED_BY_USER
   });
   return event.save();
 }
 
+
 /**
- * Increase or decrease a user reputation.
+ * Save event by Owner 
  * @returns {Promise.<*>}
  * @private
  */
-async function _reputationAddition (userId, value) {
-  try {
-    const user = await User.get(userId);
-    return user.reputationAddition(value);
-  } catch (err) {
-    const reputationError = new Error(ErrorMessages.ERROR_REPUTATION + err.message);
-    throw reputationError;
-  }
+function _saveEventOwner (matchId, barId) {
+  const event = new Event({
+    match: matchId,
+    bar: barId,
+    user: userId,
+    state: States.CREATED_BY_OWNER
+  });
+  return event.save();
 }
-
 
 
 /**

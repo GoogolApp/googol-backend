@@ -4,6 +4,7 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 const Bar = require('../bar/bar.model');
+const States = require('./event.state.js'); 
 
 
 
@@ -26,6 +27,11 @@ const EventSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId, ref: 'User'
+  },
+  state: {
+    type: String,
+    enum : [States.CONFIRMED_BY_OWNER,States.CREATED_BY_OWNER, States.CREATED_BY_USER, States.DELETED_BY_USER, States.UNCONFIMED_BY_OWNER],
+    default: 'CREATED_BY_USER'
   },
   createdAt: {
     type: Date,
