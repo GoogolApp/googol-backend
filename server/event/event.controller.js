@@ -9,7 +9,7 @@ const ErrorMessages = require('../helpers/ErrorMessages');
 const APIError = require('../helpers/APIError');
 const httpStatus = require('http-status');
 const Utils = require('../helpers/Utils')
-const States = require('./event.state.js'); 
+const States = require('./event.state.js');
 
 
 
@@ -65,9 +65,9 @@ async function list(req, res, next) {
 
 /**
  * Search events
- * @property {number} req.query.latitude - Latitude of the point of the center of the search 
- * @property {number} req.query.longitude -  Longitude of the point of the center of the search 
- * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers 
+ * @property {number} req.query.latitude - Latitude of the point of the center of the search
+ * @property {number} req.query.longitude -  Longitude of the point of the center of the search
+ * @property {number} req.query.maxDistance - Radius from the point of the center of the search in kilometers
  * @returns [{Event}]
  */
 async function geoList(req, res, next) {
@@ -97,7 +97,7 @@ function compare(a,b) {
 }
 
 /**
- * Create new event 
+ * Create new event
  * @property {string} req.body.matchId - The Id of a match.
  * @property {string} req.body.barId - The Id of a bar.
  * @property {string} req.body.userId - The Id of an User. Optional.
@@ -107,16 +107,18 @@ async function create(req, res, next) {
   try {
     const cachedMatch = await matchService.getMatchById(req.body.matchId);
     const dateIsValid = matchService.isFutureMatch(cachedMatch);
+
     if (!dateIsValid) {
       const err = new APIError(ErrorMessages.INVALID_MATCH_DATE, httpStatus.BAD_REQUEST);
       return next(err);
     }
+
     if (req.user.role === 'user') {
       const event = await _saveEventUser(req.body.matchId, req.body.barId, req.body.userId);
       let reputation = await reputationController.reputationCreateEvent(req.user._id);
       res.json({'repIncrement': reputation, 'event': event});
-    } else if (req.user.role === 'owner'){
-      const event = await _saveEventOwner(req.body.matchId, req.body.barId);
+    } else if (req.user.role === 'owner') {
+      const event = await _saveEventOwner(req.body.matchId, req.body.barId, req.user._id);
       res.json(event);
     }
   } catch (err) {
@@ -142,11 +144,11 @@ function _saveEventUser (matchId, barId, userId) {
 
 
 /**
- * Save event by Owner 
+ * Save event by Owner
  * @returns {Promise.<*>}
  * @private
  */
-function _saveEventOwner (matchId, barId) {
+function _saveEventOwner (matchId, barId, userId) {
   const event = new Event({
     match: matchId,
     bar: barId,
