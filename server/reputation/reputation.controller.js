@@ -4,8 +4,8 @@ const reputatioConstants = require('../reputation/reputation.constants');
 
 /**
  * Add reputation for the creator of an Event
- * @property {string} userId
- * @returns Number
+ * @param userId
+ * @returns {number} increment
  */
 async function reputationCreateEvent(userId){
   try {
@@ -20,12 +20,12 @@ async function reputationCreateEvent(userId){
   }
 }
 
-
 /**
  * Add reputation for the creator of an Event when the event has a new attendant,
  * Add reputation to the new attendant also.
- * @property {string} userId
- * @returns Number
+ * @param userIdCreator
+ * @param userIdAttendant
+ * @returns {number} increment
  */
 async function reputationNewAttendant(userIdCreator, userIdAttendant){
   try {
@@ -50,11 +50,10 @@ async function reputationNewAttendant(userIdCreator, userIdAttendant){
   }
 }
 
-
 /**
  * Remove reputation for the attendant of an Event
- * @property {string} userId
- * @returns Number
+ * @param userIdCreator
+ * @param userIdAttendant
  */
 async function reputationRemoveAttendant(userIdCreator, userIdAttendant){
   try {
@@ -78,12 +77,9 @@ async function reputationRemoveAttendant(userIdCreator, userIdAttendant){
   }
 }
 
-
-
 /**
- * Remove reputation for the attendant of an Event
- * @property {string} userId
- * @returns Number
+ * Adds reputation for the creator of an Event if the owner confirm.
+ * @param userIdCreator
  */
 async function reputationOwnerConfirm(userIdCreator){
   try {
@@ -91,6 +87,22 @@ async function reputationOwnerConfirm(userIdCreator){
     if(userIdCreator != undefined){
       const creator = await User.get(userIdCreator);
       await creator.directReputationAddition(reputatioConstants.INCREMENT_CONFIRMED_BY_USER);
+    }
+  }catch (err) {
+    throw(err);
+  }
+}
+
+/**
+ * Remove reputation for the creator of an Event if the owner unconfirm
+ * @param userIdCreator
+ */
+async function reputationOwnerUnconfirm(userIdCreator){
+  try {
+    //DECREASE REPUTATION TO CREATOR
+    if(userIdCreator != undefined){
+      const creator = await User.get(userIdCreator);
+      await creator.directReputationAddition(reputatioConstants.DECREMENT_OWNER_UNCONFIRM);
     }
   }catch (err) {
     throw(err);
