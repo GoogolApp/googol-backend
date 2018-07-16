@@ -27,7 +27,10 @@ router.route('/:eventId')
   .get(validate(paramValidation.getById), eventCtrl.get)
 
   /** PATCH /api/events/:eventid  - Confirm or unconfirm event. Route used by user and owner */
-  .patch([validate(paramValidation.confirmUnconfirm), expressJwt({ secret: config.jwtSecret })], eventCtrl.confirmUnconfirm);
+  .patch([validate(paramValidation.confirmUnconfirm), expressJwt({ secret: config.jwtSecret })], eventCtrl.confirmUnconfirm)
+
+  /** DELETE /api/events/:eventId - Delete an event. Route usey by user and owner */
+  .delete([validate(paramValidation.deleteEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.remove);
 
 /** Load event when API with eventId route parameter is hit */
 router.param('eventId', eventCtrl.load);

@@ -38,6 +38,12 @@ module.exports = {
     body: {
       operation: Joi.string().valid(CONFIRM, UNCONFIRM, CONFIRM_BY_OWNER, UNCONFIRM_BY_OWNER).required()
     }
+  },
+
+  deleteEvent:{
+    params: {
+      eventId: objectIdJoiValidator.required()
+    }
   }
   
 };
