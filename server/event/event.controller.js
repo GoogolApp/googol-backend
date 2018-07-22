@@ -170,8 +170,7 @@ function _saveEventOwner (matchId, barId, userId) {
  * @returns {ConfirmationObj}
  */
 async function confirmUnconfirm(req, res, next) {
-  try{
-
+  try {
     const event = req.queryEvent;
     let reqUser = req.user; 
     let confirmationObj = {};  
@@ -193,7 +192,7 @@ async function confirmUnconfirm(req, res, next) {
         throw new APIError(ErrorMessages.INVALID_OPERATION, httpStatus.BAD_REQUEST);
     }
     res.json(confirmationObj);
-  }catch(err){
+  } catch(err) {
     next(err);
   }
 }
@@ -207,13 +206,13 @@ async function confirmUnconfirm(req, res, next) {
  * @returns {Promise.<*>}
  */
 async function _userConfirm (attendant, event) {
-  try{
+  try {
     const createdBy = event.user;
     const eventMongoObj = await Event.get(event._id);
     await eventMongoObj.addAttendant(attendant._id);
     const reputation = await reputationController.reputationNewAttendant(createdBy, attendant._id);
     return {'repIncrement': reputation, 'event': event};
-  }catch(err){
+  } catch(err) {
     throw(err);
   }
 }
@@ -227,13 +226,13 @@ async function _userConfirm (attendant, event) {
  * @private 
  */
 async function _userUnconfirm (attendant, event) {
-  try{
+  try {
     const createdBy = event.user;
     const eventMongoObj = await Event.get(event._id);
     await eventMongoObj.removeAttendant(attendant._id);
     const reputation = await reputationController.reputationRemoveAttendant(createdBy, attendant._id);
     return {'repIncrement': reputation, 'event': event};
-  }catch(err){
+  } catch(err) {
     throw(err);
   }
 }
@@ -247,17 +246,17 @@ async function _userUnconfirm (attendant, event) {
  * @returns {Promise.<*>}
  */
 async function _ownerConfirm (owner, event) {
-  try{
+  try {
     const createdBy = event.user;
     const eventMongoObj = await Event.get(event._id);
     const ownerBar = await Owner.get(owner._id);
-    if(!ownerBar.bar._id.equals(event.bar._id)){
+    if (!ownerBar.bar._id.equals(event.bar._id)) {
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
     }
     await eventMongoObj.changeState(States.CONFIRMED_BY_OWNER);
     await reputationController.reputationOwnerConfirm(createdBy);
     return event;
-  }catch(err){
+  } catch(err) {
     throw(err);
   }
 }
@@ -271,32 +270,92 @@ async function _ownerConfirm (owner, event) {
  * @returns {Promise.<*>}
  */
 async function _ownerUnconfirm (owner, event) {
-  try{
+  try {
     const createdBy = event.user;
     const eventMongoObj = await Event.get(event._id);
     const ownerBar = await Owner.get(owner._id);
-    if(!ownerBar.bar._id.equals(event.bar._id)){
+    if (!ownerBar.bar._id.equals(event.bar._id)) {
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
     }
     await eventMongoObj.changeState(States.UNCONFIMED_BY_OWNER);
     await reputationController.reputationOwnerUnconfirm(createdBy);
     return event;
-  }catch(err){
+  } catch(err) {
     throw(err);
   }
 }
 
 
 /**
- * Delete event.
+ * Delete event. used by 
  * @returns {Event}
  */
-function remove(req, res, next) {
-  const event = req.queryEvent;
-  event.remove()
-    .then(deletedEvent => res.json(deletedEvent))
-    .catch(e => next(e));
+async function remove(req, res, next) {
+  try {
+    const event = req.queryEvent;
+    const eventMongoObj = await Event.get(event._id);
+    const attendantsLen = event.attendants.length;
+    if (req.user.role === 'user') {
+      response = await _userRemove(eventMongoObj, attendantsLen, req.user);
+    } else if (req.user.role === 'owner') {
+      response = await _ownerRemove(eventMongoObj, attendantsLen, req.user);
+    }
+    return res.json(response);
+  } catch(err) {
+    next(err);
+  }
 }
+
+
+/**
+ * Remove an event, do not remove 4 real, only change state
+ * @param event
+ * @param attendantsLen 
+ * @param reqUser 
+ * 
+ * @private
+ * @returns {Promise.<*>}
+ */
+async function _userRemove(event, attendantsLen, reqUser) {
+  try {
+    const createdBy = event.createdBy;
+    if (event.state === States.CONFIRMED_BY_OWNER) {
+      throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_CONFIRMED, httpStatus.FORBIDDEN);
+    } else if(event.user.equals(reqUser._id)){
+      throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_EVENT, httpStatus.FORBIDDEN);
+    }
+    await reputationController.reputationUserRemove(createdBy, attendantsLen);
+    await event.changeState(States.DELETED_BY_USER);
+    return event;
+  } catch (err){
+    throw err;
+  }
+}
+
+/**
+ * Remove an event, do not remove 4 real, only change state
+ * @param event
+ * @param attendantsLen 
+ * @param reqUser 
+ * 
+ * @private
+ * @returns {Promise.<*>}
+ */
+async function _ownerRemove(event, attendantsLen, reqUser) {
+  try {
+    const createdBy = event.createdBy;
+    const ownerBar = await Owner.get(reqUser._id);
+    if(!ownerBar.bar._id.equals(event.bar._id)){
+      throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
+    }
+    await reputationController.reputationOwnerUnconfirm(createdBy, attendantsLen);
+    await event.changeState(States.UNCONFIMED_BY_OWNER);
+    return event;
+  } catch (err){
+    throw err;
+  }
+}
+
 
 
 module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm};

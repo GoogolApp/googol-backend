@@ -97,16 +97,38 @@ async function reputationOwnerConfirm(userIdCreator){
  * Remove reputation for the creator of an Event if the owner unconfirm
  * @param userIdCreator
  */
-async function reputationOwnerUnconfirm(userIdCreator){
+async function reputationOwnerUnconfirm(userIdCreator, attendants){
   try {
     //DECREASE REPUTATION TO CREATOR
     if(userIdCreator != undefined){
       const creator = await User.get(userIdCreator);
       await creator.directReputationAddition(reputatioConstants.DECREMENT_OWNER_UNCONFIRM);
+      await creator.dailyReputationAddition(reputatioConstants.DECREMENT_OWNER_UNCONFIRM);
+      await creator.directReputationAddition(attendants * reputatioConstants.DECREMENT_ATTEND);
     }
   }catch (err) {
     throw(err);
   }
 }
 
-module.exports = {reputationCreateEvent, reputationNewAttendant, reputationRemoveAttendant, reputationOwnerConfirm};
+/**
+ * Remove reputation for the creator of an Event if the user removes the event
+ * @param userIdCreator
+ * @param attendants
+ */
+async function reputationUserRemove(userIdCreator, attendants){
+  try {
+    //DECREASE REPUTATION TO CREATOR
+    if(userIdCreator != undefined){
+      const creator = await User.get(userIdCreator);
+      await creator.directReputationAddition(reputatioConstants.REMOVE_EVENT);
+      await creator.dailyReputationAddition(reputatioConstants.REMOVE_EVENT);
+      await creator.directReputationAddition(attendants * reputatioConstants.DECREMENT_ATTEND);
+    }
+  }catch (err) {
+    throw(err);
+  }
+}
+
+
+module.exports = {reputationCreateEvent, reputationNewAttendant, reputationRemoveAttendant, reputationOwnerConfirm, reputationOwnerUnconfirm, reputationUserRemove};

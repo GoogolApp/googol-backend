@@ -36,8 +36,10 @@ module.exports = {
   EVENT_NOT_FOUND: 'Evento não encontrado.',
   INVALID_OPERATION: 'Operação inválida',
   FORBIDDEN_OPERATION: 'Desculpe, você não tem premissões sobre esse bar',
+  FORBIDDEN_OPERATION_EVENT: 'Desculpe, você não tem premissões sobre esse evento',
   ERROR_ADD_ATTENDANT: 'O usuário já confirmou presença nesse evento',
-  ERROR_REMOVE_ATTENDANT: 'O usuário já desconfirmou presença nesse evento'
+  ERROR_REMOVE_ATTENDANT: 'O usuário já desconfirmou presença nesse evento',
+  FORBIDDEN_OPERATION_CONFIRMED: 'Esse evento não pode ser deletado, já foi confirmado pelo owner'
   
 
 };
