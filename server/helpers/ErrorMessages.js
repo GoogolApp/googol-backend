@@ -33,7 +33,11 @@ module.exports = {
   //event
   ERROR_CREATE_EVENT: 'Evento já existente.',
   ERROR_REPUTATION: 'Erro ao adicionar reputação ao usuário: ',
-  EVENT_NOT_FOUND: 'Evento não encontrado.'
+  EVENT_NOT_FOUND: 'Evento não encontrado.',
+  INVALID_OPERATION: 'Operação inválida',
+  FORBIDDEN_OPERATION: 'Desculpe, você não tem premissões sobre esse bar',
+  ERROR_ADD_ATTENDANT: 'O usuário já confirmou presença nesse evento',
+  ERROR_REMOVE_ATTENDANT: 'O usuário já desconfirmou presença nesse evento'
   
 
 };

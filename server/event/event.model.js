@@ -45,6 +45,7 @@ const EventSchema = new mongoose.Schema({
 EventSchema.index({ match: 1, bar: 1 }, { unique: true });
 
 
+
 /**
  * Add your
  * - pre-save hooks
@@ -79,6 +80,36 @@ EventSchema.post('save', function (error, doc, next) {
 /**
  * Methods
  */
+EventSchema.method({
+  addAttendant (userId) {
+    this.attendants.forEach(user => {
+      if(user._id.equals(userId)){
+        throw new Error(ErrorMessages.ERROR_ADD_ATTENDANT);
+      }
+    })
+    return this.update({$addToSet: {attendants: {_id: userId}}});
+  },
+
+  removeAttendant (userId) {
+    found = false;
+    this.attendants.forEach(user => {
+      if(user._id.equals(userId)){
+        found = true;
+      }
+    })
+    if(found){
+      return this.update({$pull: {attendants: userId}}, {safe: true, new: true});
+    }else{
+      throw new Error(ErrorMessages.ERROR_REMOVE_ATTENDANT);
+    }
+  },
+
+  changeState (state) {
+    return this.update({state: state}, {safe: true, new: true});
+  }
+});
+
+
 
 /**
  * Statics

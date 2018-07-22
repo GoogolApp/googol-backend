@@ -5,7 +5,7 @@ const config = require('../../config/config');
 
 const validate = require('express-validation');
 const paramValidation = require('./bar.validator');
-const authCtrl = require('../auth/auth.controller')
+const authCtrl = require('../auth/auth.controller');
 
 const barCtrl = require('./bar.controller');
 

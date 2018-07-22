@@ -1,6 +1,8 @@
 const Event = require('./event.model');
 const User = require('../user/user.model');
 const Bar = require('../bar/bar.model');
+const Owner = require('../owner/owner.model');
+
 
 const matchService = require('../match/match.service');
 const reputationController = require('../reputation/reputation.controller');
@@ -114,7 +116,7 @@ async function create(req, res, next) {
     }
 
     if (req.user.role === 'user') {
-      const event = await _saveEventUser(req.body.matchId, req.body.barId, req.body.userId);
+      const event = await _saveEventUser(req.body.matchId, req.body.barId, req.user._id);
       let reputation = await reputationController.reputationCreateEvent(req.user._id);
       res.json({'repIncrement': reputation, 'event': event});
     } else if (req.user.role === 'owner') {
@@ -129,8 +131,8 @@ async function create(req, res, next) {
 
 /**
  * Save event by User
- * @returns {Promise.<*>}
  * @private
+ * @returns {Promise.<*>}
  */
 function _saveEventUser (matchId, barId, userId) {
   const event = new Event({
@@ -144,9 +146,10 @@ function _saveEventUser (matchId, barId, userId) {
 
 
 /**
- * Save event by Owner
+ * Save event by Owner 
  * @returns {Promise.<*>}
  * @private
+ * @returns {Promise.<*>}
  */
 function _saveEventOwner (matchId, barId, userId) {
   const event = new Event({
@@ -156,6 +159,131 @@ function _saveEventOwner (matchId, barId, userId) {
     state: States.CREATED_BY_OWNER
   });
   return event.save();
+}
+
+
+/**
+ * Confirm or unconfirm event.
+ * Can be used by owner to confirm an event.
+ * @property {string} req.body.operation 
+ * @property {User} req.user 
+ * @returns {ConfirmationObj}
+ */
+async function confirmUnconfirm(req, res, next) {
+  try{
+
+    const event = req.queryEvent;
+    let reqUser = req.user; 
+    let confirmationObj = {};  
+    const operation = req.body.operation;
+    switch (operation) {
+      case "confirm":
+        confirmationObj = await _userConfirm (reqUser, event);
+        break;
+      case "unconfirm":
+        confirmationObj = await _userUnconfirm (reqUser, event);
+        break;
+      case "confirmedByOwner":
+        confirmationObj = await _ownerConfirm (reqUser, event);
+        break;
+      case "unconfirmedByOwner":
+        confirmationObj = await _ownerUnconfirm (reqUser, event);
+        break;
+      default:
+        throw new APIError(ErrorMessages.INVALID_OPERATION, httpStatus.BAD_REQUEST);
+    }
+    res.json(confirmationObj);
+  }catch(err){
+    next(err);
+  }
+}
+
+/**
+ * Add uset to event attendants list
+ * Add reputation to creator and attendant 
+ * @param attendant
+ * @param event 
+ * @private 
+ * @returns {Promise.<*>}
+ */
+async function _userConfirm (attendant, event) {
+  try{
+    const createdBy = event.user;
+    const eventMongoObj = await Event.get(event._id);
+    await eventMongoObj.addAttendant(attendant._id);
+    const reputation = await reputationController.reputationNewAttendant(createdBy, attendant._id);
+    return {'repIncrement': reputation, 'event': event};
+  }catch(err){
+    throw(err);
+  }
+}
+
+/**
+ * Remove user to attendants on the event
+ * Remove reputation from attendant and creator
+ * @returns {Promise.<*>}
+ * @param attendant
+ * @param event
+ * @private 
+ */
+async function _userUnconfirm (attendant, event) {
+  try{
+    const createdBy = event.user;
+    const eventMongoObj = await Event.get(event._id);
+    await eventMongoObj.removeAttendant(attendant._id);
+    const reputation = await reputationController.reputationRemoveAttendant(createdBy, attendant._id);
+    return {'repIncrement': reputation, 'event': event};
+  }catch(err){
+    throw(err);
+  }
+}
+
+/**
+ * Change state of the event to CONFIRMED_BY_OWNER 
+ * Add reputation for the creator of the Event 
+ * @param owner
+ * @param event 
+ * @private
+ * @returns {Promise.<*>}
+ */
+async function _ownerConfirm (owner, event) {
+  try{
+    const createdBy = event.user;
+    const eventMongoObj = await Event.get(event._id);
+    const ownerBar = await Owner.get(owner._id);
+    if(!ownerBar.bar._id.equals(event.bar._id)){
+      throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
+    }
+    await eventMongoObj.changeState(States.CONFIRMED_BY_OWNER);
+    await reputationController.reputationOwnerConfirm(createdBy);
+    return event;
+  }catch(err){
+    throw(err);
+  }
+}
+
+/**
+ * Change state of the event to UNCONFIRMED_BY_OWNER 
+ * Remove reputation for the creator of an Event if the owner unconfirm
+ * @param owner
+ * @param event 
+ * @private
+ * @returns {Promise.<*>}
+ */
+async function _ownerUnconfirm (owner, event) {
+  try{
+    const createdBy = event.user;
+    const eventMongoObj = await Event.get(event._id);
+    const ownerBar = await Owner.get(owner._id);
+    if(!ownerBar.bar._id.equals(event.bar._id)){
+      throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
+    }
+    await eventMongoObj.changeState(States.UNCONFIMED_BY_OWNER);
+    await reputationController.reputationOwnerUnconfirm(createdBy);
+    return event;
+  }catch(err){
+    throw(err);
+  }
 }
 
 
@@ -170,4 +298,6 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, remove, list, geoList};
+
+module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm};
+
