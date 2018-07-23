@@ -163,6 +163,35 @@ EventSchema.statics = {
       .sort({distance: 1})
       .limit(+limit)
       .exec();
+  },
+
+    /**
+   * List events in that an user created.
+   * @param {string} userId - Id on an user
+   * @returns {Promise<Events[]>}
+   */
+  getCreateBy(userId){
+    return this.find({'user': userId}).exec();
+  },
+
+  /**
+   * List events from users that I follow.
+   * @param {string} followingUsers[] - Ids of users
+   * @returns {Promise<Events[]>}
+   */
+  getFollowingUsers(followingUsers){
+    return this.find({'attendants' : {$in: followingUsers}})
+    .exec();
+  },
+
+  /**
+   * List events from bars that I follow.
+   * @param {string} followingBars[] - Ids of bars
+   * @returns {Promise<Events[]>}
+   */
+  getFollowingBars(followingBars){
+    return this.find({'bar' : {$in: followingBars}})
+    .exec();
   }
 };
 

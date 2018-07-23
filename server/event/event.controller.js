@@ -357,6 +357,56 @@ async function _ownerRemove(event, attendantsLen, reqUser) {
 }
 
 
+/**
+ * Get events created by an User
+ * @returns {[Event()]}
+ */
+function getCreateBy(req, res, next){
+  Event.getCreateBy(req.params.userId)
+  .then((events) => {
+    return res.json(events);
+  })
+  .catch(e => next(e));
+}
 
-module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm};
+/**
+ * Get events from an User following Users
+ * @returns {[Event()]}
+ */
+async function getFollowingUsers(req, res, next){
+  try{
+    const usersWithFollowing = await User.followingUsers(req.params.userId);
+    const usersWithFollowingObj = usersWithFollowing.toObject();
+    const following = usersWithFollowingObj.following;
+    const followingUsersId = await following.map((user) => {
+      return user._id;
+    });
+    const events = await Event.getFollowingUsers(followingUsersId);
+    return res.json(events);
+  }catch(err){
+    next(err);
+  }
+
+}
+
+/**
+ * Get events from an User following bars
+ * @returns {[Event()]}
+ */
+async function getFollowingBars(req, res, next){
+  try{
+    const usersWithFollowingBars = await User.getFollowingBars(req.params.userId);
+    const usersWithFollowingBarsObj = usersWithFollowingBars.toObject();
+    const following = usersWithFollowingBarsObj.followingBars;
+    const followingUsersId = await following.map((user) => {
+      return user._id;
+    });
+    const events = await Event.getFollowingBars(followingUsersId)
+    return res.json(events);
+  }catch(err){
+    next(err);
+  }
+}
+
+module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm, getCreateBy, getFollowingUsers, getFollowingBars};
 
