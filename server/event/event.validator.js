@@ -55,15 +55,22 @@ module.exports = {
     }
   },
 
-  //GET /api/events/:eventid/followingUsers
+  // GET /api/events/followingUsers/:userId
   getFollowingUsers:{
     params: {
       userId: objectIdJoiValidator.required()
     }
   },
 
-  // GET /api/events/:eventid/followingBars
+  // GET /api/events/followingBars/:userId 
   getFollowingBars:{
+    params: {
+      userId: objectIdJoiValidator.required()
+    }
+  },
+
+  // GET /api/events/feed/:userId
+  getFollowingFeed:{
     params: {
       userId: objectIdJoiValidator.required()
     }

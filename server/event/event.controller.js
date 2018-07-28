@@ -375,7 +375,17 @@ function getCreateBy(req, res, next){
  */
 async function getFollowingUsers(req, res, next){
   try{
-    const usersWithFollowing = await User.followingUsers(req.params.userId);
+    let events = await _followingUsers( req.params.userId );
+    return res.json( events );
+  }catch(err){
+    next(err);
+  }
+
+}
+
+async function _followingUsers(userId){
+  try{
+    const usersWithFollowing = await User.followingUsers(userId);
     const usersWithFollowingObj = usersWithFollowing.toObject();
     const following = usersWithFollowingObj.following;
     const followingUsersId = await following.map((user) => {
@@ -390,11 +400,10 @@ async function getFollowingUsers(req, res, next){
       });
     });
     events = await Promise.all(events);
-    return res.json(events);
+    return events;
   }catch(err){
     next(err);
   }
-
 }
 
 /**
@@ -403,12 +412,21 @@ async function getFollowingUsers(req, res, next){
  */
 async function getFollowingBars(req, res, next){
   try{
-    let following = await User.getFollowingBars(req.params.userId);
-    following = following.toObject();
-    const followingUsersId = await following.map((user) => {
-      return user._id;
+    let events = await _followingBars(req.params.userId);
+    return res.json(events);
+  }catch(err){
+    next(err);
+  }
+}
+
+async function _followingBars(userId){
+  try {
+    let followingBars = await User.getFollowingBars(userId);
+    followingBars = followingBars.toObject();
+    const followingBarsId = await followingBars.map((bar) => {
+      return bar._id;
     });
-    let events = await Event.getFollowingBars(followingUsersId);
+    let events = await Event.getFollowingBars(followingBarsId);
     events = events.map((event) => {
       return matchService.getMatchById(event.match).then((cachedMatch) => {
         const eventMatch = event.toObject();
@@ -417,11 +435,27 @@ async function getFollowingBars(req, res, next){
       });
     });
     events = await Promise.all(events);
+    return events;
+  } catch (err){
+    next(err);
+  }
+
+}
+
+/**
+ * Get events from an User following users and bars
+ * @returns {[Event()]}
+ */
+async function getFollowingFeed(req, res, next){
+  try{
+    let eventsBars = await _followingBars(req.params.userId);
+    let eventsUsers = await _followingUsers( req.params.userId );
+    events = eventsBars.concat(eventsUsers);
     return res.json(events);
   }catch(err){
     next(err);
   }
 }
 
-module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm, getCreateBy, getFollowingUsers, getFollowingBars};
+module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm, getCreateBy, getFollowingUsers, getFollowingBars, getFollowingFeed};
 
