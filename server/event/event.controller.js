@@ -318,14 +318,14 @@ async function remove(req, res, next) {
  */
 async function _userRemove(event, attendantsLen, reqUser) {
   try {
-    const createdBy = event.createdBy;
+    const createdBy = event.user;
     if (event.state === States.CONFIRMED_BY_OWNER) {
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_CONFIRMED, httpStatus.FORBIDDEN);
-    } else if(event.user.equals(reqUser._id)){
+    } else if(!event.user.equals(reqUser._id)){
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_EVENT, httpStatus.FORBIDDEN);
     }
     await reputationController.reputationUserRemove(createdBy, attendantsLen);
-    await event.changeState(States.DELETED_BY_USER);
+    await event.remove();
     return event;
   } catch (err){
     throw err;
@@ -343,7 +343,7 @@ async function _userRemove(event, attendantsLen, reqUser) {
  */
 async function _ownerRemove(event, attendantsLen, reqUser) {
   try {
-    const createdBy = event.createdBy;
+    const createdBy = event.user;
     const ownerBar = await Owner.get(reqUser._id);
     if(!ownerBar.bar._id.equals(event.bar._id)){
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
@@ -381,7 +381,15 @@ async function getFollowingUsers(req, res, next){
     const followingUsersId = await following.map((user) => {
       return user._id;
     });
-    const events = await Event.getFollowingUsers(followingUsersId);
+    let events = await Event.getFollowingUsers(followingUsersId);
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventMatch = event.toObject();
+        eventMatch.match = cachedMatch;
+        return eventMatch;
+      });
+    });
+    events = await Promise.all(events);
     return res.json(events);
   }catch(err){
     next(err);
@@ -395,13 +403,20 @@ async function getFollowingUsers(req, res, next){
  */
 async function getFollowingBars(req, res, next){
   try{
-    const usersWithFollowingBars = await User.getFollowingBars(req.params.userId);
-    const usersWithFollowingBarsObj = usersWithFollowingBars.toObject();
-    const following = usersWithFollowingBarsObj.followingBars;
+    let following = await User.getFollowingBars(req.params.userId);
+    following = following.toObject();
     const followingUsersId = await following.map((user) => {
       return user._id;
     });
-    const events = await Event.getFollowingBars(followingUsersId)
+    let events = await Event.getFollowingBars(followingUsersId);
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventMatch = event.toObject();
+        eventMatch.match = cachedMatch;
+        return eventMatch;
+      });
+    });
+    events = await Promise.all(events);
     return res.json(events);
   }catch(err){
     next(err);

@@ -179,9 +179,13 @@ EventSchema.statics = {
    * @param {string} followingUsers[] - Ids of users
    * @returns {Promise<Events[]>}
    */
-  getFollowingUsers(followingUsers){
+  getFollowingUsers(followingUsers, { skip = 0, limit = 50 } = {}){
     return this.find({'attendants' : {$in: followingUsers}})
-    .exec();
+      .populate([{path:'bar'}, {path:'attendants'}])
+      .sort({ createdAt: -1 })
+      .skip(+skip)
+      .limit(+limit)
+      .exec();  
   },
 
   /**
@@ -189,9 +193,13 @@ EventSchema.statics = {
    * @param {string} followingBars[] - Ids of bars
    * @returns {Promise<Events[]>}
    */
-  getFollowingBars(followingBars){
+  getFollowingBars(followingBars, { skip = 0, limit = 50 } = {}){
     return this.find({'bar' : {$in: followingBars}})
-    .exec();
+      .populate([{path:'bar'}, {path:'attendants'}])
+      .sort({ createdAt: -1 })
+      .skip(+skip)
+      .limit(+limit)
+      .exec();
   }
 };
 
