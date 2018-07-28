@@ -318,14 +318,14 @@ async function remove(req, res, next) {
  */
 async function _userRemove(event, attendantsLen, reqUser) {
   try {
-    const createdBy = event.createdBy;
+    const createdBy = event.user;
     if (event.state === States.CONFIRMED_BY_OWNER) {
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_CONFIRMED, httpStatus.FORBIDDEN);
-    } else if(event.user.equals(reqUser._id)){
+    } else if(!event.user.equals(reqUser._id)){
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION_EVENT, httpStatus.FORBIDDEN);
     }
     await reputationController.reputationUserRemove(createdBy, attendantsLen);
-    await event.changeState(States.DELETED_BY_USER);
+    await event.remove();
     return event;
   } catch (err){
     throw err;
@@ -343,7 +343,7 @@ async function _userRemove(event, attendantsLen, reqUser) {
  */
 async function _ownerRemove(event, attendantsLen, reqUser) {
   try {
-    const createdBy = event.createdBy;
+    const createdBy = event.user;
     const ownerBar = await Owner.get(reqUser._id);
     if(!ownerBar.bar._id.equals(event.bar._id)){
       throw new APIError(ErrorMessages.FORBIDDEN_OPERATION, httpStatus.FORBIDDEN);
@@ -357,6 +357,71 @@ async function _ownerRemove(event, attendantsLen, reqUser) {
 }
 
 
+/**
+ * Get events created by an User
+ * @returns {[Event()]}
+ */
+function getCreateBy(req, res, next){
+  Event.getCreateBy(req.params.userId)
+  .then((events) => {
+    return res.json(events);
+  })
+  .catch(e => next(e));
+}
 
-module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm};
+/**
+ * Get events from an User following Users
+ * @returns {[Event()]}
+ */
+async function getFollowingUsers(req, res, next){
+  try{
+    const usersWithFollowing = await User.followingUsers(req.params.userId);
+    const usersWithFollowingObj = usersWithFollowing.toObject();
+    const following = usersWithFollowingObj.following;
+    const followingUsersId = await following.map((user) => {
+      return user._id;
+    });
+    let events = await Event.getFollowingUsers(followingUsersId);
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventMatch = event.toObject();
+        eventMatch.match = cachedMatch;
+        return eventMatch;
+      });
+    });
+    events = await Promise.all(events);
+    return res.json(events);
+  }catch(err){
+    next(err);
+  }
+
+}
+
+/**
+ * Get events from an User following bars
+ * @returns {[Event()]}
+ */
+async function getFollowingBars(req, res, next){
+  try{
+    let following = await User.getFollowingBars(req.params.userId);
+    following = following.toObject();
+    const followingUsersId = await following.map((user) => {
+      return user._id;
+    });
+    let events = await Event.getFollowingBars(followingUsersId);
+    events = events.map((event) => {
+      return matchService.getMatchById(event.match).then((cachedMatch) => {
+        const eventMatch = event.toObject();
+        eventMatch.match = cachedMatch;
+        return eventMatch;
+      });
+    });
+    events = await Promise.all(events);
+    return res.json(events);
+  }catch(err){
+    next(err);
+  }
+}
+
+module.exports = { load, get, create, remove, list, geoList, confirmUnconfirm, getCreateBy, getFollowingUsers, getFollowingBars};
 

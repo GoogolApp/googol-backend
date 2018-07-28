@@ -31,6 +31,7 @@ module.exports = {
     
   },
 
+  // PATCH /api/events/:eventid
   confirmUnconfirm:{
     params: {
       eventId: objectIdJoiValidator.required()
@@ -40,9 +41,31 @@ module.exports = {
     }
   },
 
+  //DELETE /api/events/:eventId
   deleteEvent:{
     params: {
       eventId: objectIdJoiValidator.required()
+    }
+  },
+
+  //GET /api/events/:eventid/createdBy
+  getCreateBy:{
+    params: {
+      userId: objectIdJoiValidator.required()
+    }
+  },
+
+  //GET /api/events/:eventid/followingUsers
+  getFollowingUsers:{
+    params: {
+      userId: objectIdJoiValidator.required()
+    }
+  },
+
+  // GET /api/events/:eventid/followingBars
+  getFollowingBars:{
+    params: {
+      userId: objectIdJoiValidator.required()
     }
   }
   

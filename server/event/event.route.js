@@ -32,6 +32,18 @@ router.route('/:eventId')
   /** DELETE /api/events/:eventId - Delete an event. Route usey by user and owner */
   .delete([validate(paramValidation.deleteEvent), expressJwt({ secret: config.jwtSecret })], eventCtrl.remove);
 
+router.route('/createdBy/:userId')
+  /** GET /api/events/:eventid/createdBy - Get events created by me*/
+  .get(validate(paramValidation.getCreateBy), eventCtrl.getCreateBy)
+
+router.route('/followingUsers/:userId')
+  /** GET /api/events/:eventid/followingUsers - Get events that my folloring users confirmed */
+  .get(validate(paramValidation.getFollowingUsers), eventCtrl.getFollowingUsers)
+
+router.route('/followingBars/:userId')
+  /** GET /api/events/:eventid/followingBars - Get events from bars the user follow */
+  .get(validate(paramValidation.getFollowingBars), eventCtrl.getFollowingBars)
+
 /** Load event when API with eventId route parameter is hit */
 router.param('eventId', eventCtrl.load);
 
