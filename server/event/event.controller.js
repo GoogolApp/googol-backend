@@ -155,7 +155,6 @@ function _saveEventOwner (matchId, barId, userId) {
   const event = new Event({
     match: matchId,
     bar: barId,
-    user: userId,
     state: States.CREATED_BY_OWNER
   });
   return event.save();
