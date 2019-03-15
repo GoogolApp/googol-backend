@@ -110,4 +110,13 @@ const checkOwner = (req, res, next) => {
   }
 };
 
+const recoverPassword = async (req, res, next) => {
+  const user = req.queryUser;
+  const { password } = req.body;
+  user.password = password;
+  user.save()
+    .then(savedUser => res.json(savedUser))
+    .catch(e => next(e));
+};
+
 module.exports = {login, checkUser, ownerLogin, checkOwner, checkBarOwner};
