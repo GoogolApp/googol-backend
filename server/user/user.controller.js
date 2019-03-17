@@ -66,16 +66,12 @@ function create(req, res, next) {
 /**
  * Update existing user
  * @property {string} req.body.username - The username of user.
- * @property {string} req.body.password - The name of user.
  * @returns {User}
  */
 function update(req, res, next) {
   const user = req.queryUser;
-  if(req.body.username){
+  if (req.body.username) {
     user.username = req.body.username;
-  }
-  if(req.body.password){
-    user.password = req.body.password;
   }
   user.save()
     .then(savedUser => res.json(savedUser))

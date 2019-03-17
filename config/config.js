@@ -22,7 +22,8 @@ const envVarsSchema = Joi.object({
     .description('Mongo DB host url'),
   MONGO_PORT: Joi.number()
     .default(27017),
-  WHO_LET_THE_DOGS_OUT_URL: Joi.string().required()
+  WHO_LET_THE_DOGS_OUT_URL: Joi.string().required(),
+  SENDGRID_API_KEY: Joi.string().required()
 }).unknown()
   .required();
 
@@ -40,7 +41,8 @@ const config = {
     host: envVars.MONGO_HOST,
     port: envVars.MONGO_PORT
   },
-  whoLetTheDogsOutUrl: envVars.WHO_LET_THE_DOGS_OUT_URL
+  whoLetTheDogsOutUrl: envVars.WHO_LET_THE_DOGS_OUT_URL,
+  sendgridApiKey: envVars.SENDGRID_API_KEY
 };
 
 module.exports = config;
