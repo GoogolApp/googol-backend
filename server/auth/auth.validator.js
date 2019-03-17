@@ -7,5 +7,10 @@ module.exports = {
       email: Joi.string().required(),
       password: Joi.string().required()
     }
+  },
+  passwordRecovery: {
+    body: {
+      email: Joi.string().required()
+    }
   }
 };

@@ -152,4 +152,4 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner };
+module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner, sendRecoveryPasswordMail };

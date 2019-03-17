@@ -12,4 +12,7 @@ router.route('/login')
 router.route('/ownerLogin')
   .post(validate(paramValidation.login), authCtrl.ownerLogin);
 
+router.route('/recoverPassword')
+  .post(validate(paramValidation.passwordRecovery), authCtrl.sendRecoveryPasswordMail);
+
 module.exports = router;

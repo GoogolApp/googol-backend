@@ -24,7 +24,7 @@ const sendMail = (from, to, subject, content, contentType = 'text/html') => {
 };
 
 const sendPasswordRecoveryEmail = (username, userEmail, token) => {
-  const template = mailTemplateGenerator(username, token);
+  const template = mailTemplateGenerator.generateTemplate(username, token);
   return sendMail(DEFAULT_CONTATC_EMAIL, userEmail, PASSWORD_RECOVERY_SUBJECT, template);
 }
 
