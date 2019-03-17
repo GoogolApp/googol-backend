@@ -12,5 +12,10 @@ module.exports = {
     body: {
       email: Joi.string().required()
     }
+  },
+  passwordChange: {
+    body: {
+      password: Joi.string().required()
+    }
   }
 };

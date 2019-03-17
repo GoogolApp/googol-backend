@@ -140,16 +140,44 @@ const sendRecoveryPasswordMail = async (req, res, next) => {
 };
 
 const changePassword = async (req, res, next) => {
-  //TODO: this have to be validate, maybe in the middleware??
-  const user = req.queryUser;
   const { password } = req.body;
-  user.password = password;
-  try {
-    const savedUser = await user.save();
-    res.json(savedUser);
-  } catch (e) {
-    next(e);
+  const validation = validatePasswordRecovery(password, req.user);
+  if (validation.isValid) {
+    try {
+      const user = await User.get(req.user._id);
+      user.password = password;
+      await user.save();
+      res.json({message: 'password successfuly recovered!'});
+    } catch (e) {
+      next(e);
+    }
+  } else {
+    next(validation.message);
   }
 };
 
-module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner, sendRecoveryPasswordMail };
+const validatePasswordRecovery = (newPassword, tokenContent) => {
+  const EXPIRATION_TOKEN_TIME_HOURS = 8;
+
+  if (!newPassword) return {isValid: false, message: 'Empty password'};
+  
+  const now = new Date();
+  const whenTokenCreated = new Date(tokenContent.time);
+  const timeDiferenceHours = hoursDiference(now, whenTokenCreated); 
+  if (timeDiferenceHours > EXPIRATION_TOKEN_TIME_HOURS) return {isValid: false, message: 'Expired token'};
+
+  if (tokenContent.action !== 'password_recovery') return {isValid: false, message: 'This is not a password recovery token'};
+
+  return {isValid: true};
+}
+
+
+const hoursDiference = (date1, date2) => {
+  const MS_PER_HOUR = 1000 * 60 * 60;
+  const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+  const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+
+  return Math.floor((utc2 - utc1) / MS_PER_HOUR);
+}
+
+module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner, sendRecoveryPasswordMail, changePassword };
