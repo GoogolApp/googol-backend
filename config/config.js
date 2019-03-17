@@ -23,7 +23,7 @@ const envVarsSchema = Joi.object({
   MONGO_PORT: Joi.number()
     .default(27017),
   WHO_LET_THE_DOGS_OUT_URL: Joi.string().required(),
-  MAILGUN_API_TOKEN: Joi.string().required()
+  SENDGRID_API_KEY: Joi.string().required()
 }).unknown()
   .required();
 
@@ -42,7 +42,7 @@ const config = {
     port: envVars.MONGO_PORT
   },
   whoLetTheDogsOutUrl: envVars.WHO_LET_THE_DOGS_OUT_URL,
-  mailgunApiToken: envVars.MAILGUN_API_TOKEN
+  sendgridApiKey: envVars.SENDGRID_API_KEY
 };
 
 module.exports = config;

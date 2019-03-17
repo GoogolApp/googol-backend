@@ -4,6 +4,8 @@ const APIError = require('../helpers/APIError');
 const ErrorMessages = require('../helpers/ErrorMessages');
 const config = require('../../config/config');
 
+const mailService = require('../helpers/mail.service');
+
 const User = require('../user/user.model');
 const Owner = require('../owner/owner.model');
 
@@ -44,7 +46,7 @@ const login = (req, res, next) => {
 };
 
 const checkUser = (req, res, next) => {
-  if(String(req.user._id) === String(req.queryUser._id)) {
+  if (String(req.user._id) === String(req.queryUser._id)) {
     next();
   } else {
     const err = new APIError(ErrorMessages.FORBIDDEN_DEFAULT, httpStatus.FORBIDDEN, true);
@@ -102,7 +104,7 @@ const ownerLogin = (req, res, next) => {
 };
 
 const checkOwner = (req, res, next) => {
-  if(String(req.user._id) === String(req.queryOwner._id)) {
+  if (String(req.user._id) === String(req.queryOwner._id)) {
     next();
   } else {
     const err = new APIError(ErrorMessages.FORBIDDEN_DEFAULT, httpStatus.FORBIDDEN, true);
@@ -110,13 +112,44 @@ const checkOwner = (req, res, next) => {
   }
 };
 
-const recoverPassword = async (req, res, next) => {
+const sendRecoveryPasswordMail = async (req, res, next) => {
+  const userEmail = req.body.email;
+  try {
+    const user = await User.getByEmail(userEmail);
+
+    if (user && userEmail === user.email) {
+      const token = jwt.sign({
+        _id: user._id,
+        action: 'password_recovery',
+        time: new Date()
+      }, config.jwtSecret);
+
+      await mailService.sendPasswordRecoveryEmail(user.username, user.email, token);
+      
+      return res.json({
+        message: 'An recovery password email was send'
+      });
+    } else {
+      const err = new APIError(ErrorMessages.USER_NOT_FOUND, httpStatus.BAD_REQUEST, true);
+      return next(err);
+    }
+  } catch (error) {
+    const err = new APIError(error, httpStatus.INTERNAL_SERVER_ERROR);
+    return next(err);
+  };
+};
+
+const changePassword = async (req, res, next) => {
+  //TODO: this have to be validate, maybe in the middleware??
   const user = req.queryUser;
   const { password } = req.body;
   user.password = password;
-  user.save()
-    .then(savedUser => res.json(savedUser))
-    .catch(e => next(e));
+  try {
+    const savedUser = await user.save();
+    res.json(savedUser);
+  } catch (e) {
+    next(e);
+  }
 };
 
-module.exports = {login, checkUser, ownerLogin, checkOwner, checkBarOwner};
+module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner };
