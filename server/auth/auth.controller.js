@@ -9,6 +9,8 @@ const mailService = require('../helpers/mail.service');
 const User = require('../user/user.model');
 const Owner = require('../owner/owner.model');
 
+const { getPage } = require('../helpers/resetPasswordPage');
+
 const USER_ROLE = 'user';
 const OWNER_ROLE = 'owner';
 
@@ -169,8 +171,7 @@ const validatePasswordRecovery = (newPassword, tokenContent) => {
   if (tokenContent.action !== 'password_recovery') return {isValid: false, message: 'This is not a password recovery token'};
 
   return {isValid: true};
-}
-
+};
 
 const hoursDiference = (date1, date2) => {
   const MS_PER_HOUR = 1000 * 60 * 60;
@@ -178,6 +179,11 @@ const hoursDiference = (date1, date2) => {
   const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
 
   return Math.floor((utc2 - utc1) / MS_PER_HOUR);
-}
+};
 
-module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner, sendRecoveryPasswordMail, changePassword };
+const renderResetPasswordPage = (req, res, next) => {
+  const { token, username } = req.query;
+  res.send(getPage(username, token)); 
+};
+
+module.exports = { login, checkUser, ownerLogin, checkOwner, checkBarOwner, sendRecoveryPasswordMail, changePassword, renderResetPasswordPage };

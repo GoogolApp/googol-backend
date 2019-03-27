@@ -21,4 +21,7 @@ router.route('/recoverPassword')
 router.route('/changePassword')
   .post([validate(paramValidation.passwordChange), expressJwt({ secret: config.jwtSecret })], authCtrl.changePassword);
 
+router.route('/resetPassword')
+  .get(authCtrl.renderResetPasswordPage);
+
 module.exports = router;
