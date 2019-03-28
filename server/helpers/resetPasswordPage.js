@@ -106,7 +106,7 @@ const getPage = (username, token) => `
     </style>
   </head>
   <body>
-    <form class="password-wrap">
+    <form id="reset-pass-form" class="password-wrap">
       <header class="head">
         <h1>Reset Password</h1>
         <h4>Choose a new password for ${username}</h4>
@@ -114,17 +114,37 @@ const getPage = (username, token) => `
       <div class="form-wrap form">
         <div class="form-row">
           <header class="label">New Password</header>
-          <input class="input" type="password" v-model="password" />
+          <input id="password-field" class="input" type="password" />
         </div>
         <div class="form-row">
           <header class="label">Confirm Password</header>
-          <input class="input" type="password" v-model="confirm" />
+          <input id="confirm-password-field" class="input" type="password" />
         </div>
       </div>
       <footer class="foot">
         <button type="submit" class="btn txt-btn btn-primary">Reset Password</button>
       </footer>
     </form>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <script>
+      window.addEventListener('load', () => {
+        document.getElementById('reset-pass-form').addEventListener('submit', e =>  {
+          e.preventDefault();
+          const password = document.getElementById('password-field').value;
+          const confirmPassword = document.getElementById('confirm-password-field').value;
+
+          if (password !== confirmPassword) {
+            alert('not matching passwords!!');
+            return;
+          }
+
+          axios.defaults.headers.common['Authorization'] = 'bearer ${token}';
+          axios.post('changePassword', { password });
+        });
+      });
+    </script>
   </body>
 </html>
 `
