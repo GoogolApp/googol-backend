@@ -222,6 +222,17 @@ async function updateFollowingBars (req, res, next) {
 }
 
 /**
+ * Get user following bars.
+ * @returns {Bar[]}
+ */
+function getFollowingBars(req, res, next) {
+  const user = req.queryUser;
+  User.followingBars(user._id)
+    .then(bar => res.json(bar))
+    .catch(e => next(e));
+}
+
+/**
  * Add a bar to the following User list and adds the user to the bar followers list.
  *
  * @returns {Promise.<*>}
@@ -256,7 +267,7 @@ async function _unfollowBar (userDoc, barId) {
 async function getFollowingBarsPromo (req, res, next) {
   try {
     const user = req.queryUser;
-    const followedBars = await User.getFollowingBars(user._id);
+    const followedBars = await User.getFollowingBarsPromo(user._id);
 
     res.json(followedBars);
   } catch (err) {
@@ -264,4 +275,4 @@ async function getFollowingBarsPromo (req, res, next) {
   }
 }
 
-module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars, getFollowing, getFollowers, getFollowingBarsPromo};
+module.exports = {load, get, create, update, list, remove, updateFavTeams, search, updateFollowing, updateFollowingBars, getFollowingBars, getFollowing, getFollowers, getFollowingBarsPromo};

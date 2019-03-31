@@ -47,7 +47,9 @@ router.route('/:userId/followers')
   .get(userCtrl.getFollowers)
 
 router.route('/:userId/followingBars')
-  .patch([validate(paramValidation.updateFollowingBar), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowingBars);
+  .patch([validate(paramValidation.updateFollowingBar), expressJwt({ secret: config.jwtSecret }), authCtrl.checkUser], userCtrl.updateFollowingBars)
+
+  .get(userCtrl.getFollowingBars);
 
 router.route('/:userId/followingBars/promo')
   .get([validate(paramValidation.getFollowingBarsPromo), expressJwt({ secret: config.jwtSecret })], userCtrl.getFollowingBarsPromo);
