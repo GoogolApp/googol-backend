@@ -213,7 +213,17 @@ UserSchema.statics = {
     .exec()
   },
 
-  getFollowingBars (id) {
+  followingBars (id) {
+    return this.findById(id)
+    .populate({
+      path: 'followingBars',
+      select: '_id name'
+    })
+    .select({_id:1, username:1, followingBars:1})
+    .exec()
+  },
+
+  getFollowingBarsPromo (id) {
     return this.findById(id)
       .populate({
         path: 'followingBars',
