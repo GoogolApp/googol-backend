@@ -420,7 +420,7 @@ async function getFollowingBars(req, res, next){
 
 async function _followingBars(userId){
   try {
-    let followingBars = await User.getFollowingBars(userId);
+    let followingBars = await User.getFollowingBarsPromo(userId);
     followingBars = followingBars.toObject();
     const followingBarsId = await followingBars.map((bar) => {
       return bar._id;
