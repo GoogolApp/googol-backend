@@ -59,7 +59,7 @@
     "memory-cache": "false0.2.0",
     "method-override": "^2.3.10",
     "mongoose": "4.7.4",
-    "morgan": "1.9.0",
+    "morgan": "1.9.1",
     "request": "false2.87.0",
     "sendgrid": "false5.2.3",
     "winston": "2.4.1"
