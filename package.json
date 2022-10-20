@@ -58,7 +58,7 @@
     "jsonwebtoken": "7.1.9",
     "memory-cache": "false0.2.0",
     "method-override": "^2.3.10",
-    "mongoose": "4.7.4",
+    "mongoose": "4.13.21",
     "morgan": "1.9.1",
     "request": "false2.87.0",
     "sendgrid": "false5.2.3",
